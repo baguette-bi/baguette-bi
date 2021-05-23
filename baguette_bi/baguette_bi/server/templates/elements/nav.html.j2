@@ -1,0 +1,66 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+    <div class="container-xl">
+
+        <a href=" {{ url_for('index') }} " class="navbar-brand">
+            🥖
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-content" aria-controls="navbar-content" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbar-content">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="dropdown07XL" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-bar-chart extra-spacing"></i> Charts
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="dropdown07XL">
+                        <li>
+                            <a class="dropdown-item" href=" {{ url_for('index') }} ">
+                                <i class="bi bi-collection extra-spacing"></i> All Charts
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        {# <li>
+                            <a class="dropdown-item" href=" {{ url_for('bookmarks_page') }} ">
+                                <i class="bi bi-bookmarks extra-spacing"></i> My Bookmarks
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href=" {{ url_for('my_charts_page') }} ">
+                                <i class="bi bi-gear extra-spacing"></i> Maintained by Me
+                            </a>
+                        </li> #}
+                    </ul>
+                </li>
+            </ul>
+            {% if user is not none %}
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="profile-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-person extra-spacing"></i> {{ user.username }}
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="profile-dropdown">
+                        <li>
+                            <a class="dropdown-item" href=" {{ url_for('my_profile') }} ">
+                                <i class="bi bi-person extra-spacing"></i> Profile
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href=" {{ url_for('logout') }} ">
+                                <i class="bi bi-box-arrow-right extra-spacing"></i> Logout
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            {% else %}
+            <div class="navbar-nav ms-auto">
+                <a href=" {{ url_for('login_get') }} " class="nav-link">
+                    <i class="bi bi-box-arrow-in-right extra-spacing"></i> Login
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</nav>

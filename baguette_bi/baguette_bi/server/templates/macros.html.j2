@@ -1,0 +1,94 @@
+{% macro folder_breadcrumbs_link(folder, active=False) %}
+    {% set name = folder.name if folder else "🥖" %}
+    {% set href = url_for("folder_page", pk=folder.id) if folder else url_for("index") %}
+
+    {% if active %}
+        {{ name }}
+    {% else %}
+        <a class="{{ 'text-decoration-none' if not folder else '' }}" href="{{ href }}">
+            {{ name }}
+        </a>
+    {% endif %}
+{% endmacro %}
+
+
+{% macro folder_breadcrumbs_items(folder, active=True) %}
+    {% if folder %}
+        {{ folder_breadcrumbs_items(folder.parent, active=False) }}
+    {% endif %}
+    <li class="breadcrumb-item{{ ' active' if active else '' }}">
+        {{ folder_breadcrumbs_link(folder, active=active) }}
+    </li>
+{% endmacro %}
+
+
+{% macro folder_breadcrumbs(folder) %}
+    <nav class="px-4 py-3 col-12 my-4 bc-breadcrumb">
+        <ol class="breadcrumb">
+            {{ folder_breadcrumbs_items(folder) }}
+        </ol>
+    </nav>
+{% endmacro %}
+
+
+{% macro chart_breadcrumbs(chart) %}
+    <nav class="px-4 py-3 col-12 my-4 bc-breadcrumb">
+        <ol class="breadcrumb">
+            {{ folder_breadcrumbs_items(chart.folder, active=False) }}
+            <li class="breadcrumb-item active">
+                <i class="bi bi-bar-chart-line-fill"></i> {{ chart.name }}
+            </li>
+            {# <li class="pull-right me-0" style="margin: auto">
+                {% if chart in user.bookmarks %}
+                    <a href="#" onclick="toggleBookmark('{{ chart.id }}')" style="color: #212529">
+                        <i class="bi bi-bookmark-check-fill" id="bookmark-icon"></i>
+                    </a>
+                {% else %}
+                    <a href="#" onclick="toggleBookmark('{{ chart.id }}')" style="color: #212529">
+                        <i class="bi bi-bookmark" id="bookmark-icon"></i>
+                    </a>
+                {% endif %}
+            </li> #}
+        </ol>
+    </nav>
+{% endmacro %}
+
+
+{% macro display_folder(folder) %}
+    <div class="px-4 col-lg-3 col-md-4 col-sm-6 col-12 mb-4">
+        <a class="folder p-4 card" href="{{ url_for('folder_page', pk=folder.id) }}">
+            {% if folder.charts[0].preview is not none %}
+                <div class="chart-preview" style="background-image: url('{{ folder.charts[0].preview }}')"></div>
+            {% else %}
+                <div class="chart-preview-placeholder" style="background-image: url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22currentColor%22%20class%3D%22bi%20bi-bar-chart%22%20viewBox%3D%220%200%2016%2016%22%3E%0A%20%20%3Cpath%20d%3D%22M4%2011H2v3h2v-3zm5-4H7v7h2V7zm5-5v12h-2V2h2zm-2-1a1%201%200%200%200-1%201v12a1%201%200%200%200%201%201h2a1%201%200%200%200%201-1V2a1%201%200%200%200-1-1h-2zM6%207a1%201%200%200%201%201-1h2a1%201%200%200%201%201%201v7a1%201%200%200%201-1%201H7a1%201%200%200%201-1-1V7zm-5%204a1%201%200%200%201%201-1h2a1%201%200%200%201%201%201v3a1%201%200%200%201-1%201H2a1%201%200%200%201-1-1v-3z%22%2F%3E%0A%3C%2Fsvg%3E')"></div>
+            {% endif %}
+        </a>
+        <div class="mt-2 p-1">
+            <small>
+                <a class="text-decoration-none" href="{{ url_for('folder_page', pk=folder.id) }}">
+                    {{ folder.name }}
+                </a>
+            </small>
+        </div>
+    </div>
+{% endmacro %}
+
+
+{% macro display_chart(chart) %}
+    <div class="px-4 col-lg-3 col-md-4 col-sm-6 col-12 mb-4">
+        <a class="chart p-4 card" href="{{ url_for('chart_page', pk=chart.id) }}">
+            {% if chart.preview is not none %}
+                <div class="chart-preview" style="background-image: url('{{ chart.preview }}')"></div>
+            {% else %}
+                <div class="chart-preview-placeholder" style="background-image: url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22currentColor%22%20class%3D%22bi%20bi-bar-chart%22%20viewBox%3D%220%200%2016%2016%22%3E%0A%20%20%3Cpath%20d%3D%22M4%2011H2v3h2v-3zm5-4H7v7h2V7zm5-5v12h-2V2h2zm-2-1a1%201%200%200%200-1%201v12a1%201%200%200%200%201%201h2a1%201%200%200%200%201-1V2a1%201%200%200%200-1-1h-2zM6%207a1%201%200%200%201%201-1h2a1%201%200%200%201%201%201v7a1%201%200%200%201-1%201H7a1%201%200%200%201-1-1V7zm-5%204a1%201%200%200%201%201-1h2a1%201%200%200%201%201%201v3a1%201%200%200%201-1%201H2a1%201%200%200%201-1-1v-3z%22%2F%3E%0A%3C%2Fsvg%3E')"></div>
+            {% endif %}
+        </a>
+        <div class="p-1 pt-2">
+            <small>
+                <a class="text-decoration-none" href="{{ url_for('chart_page', pk=chart.id) }}">
+                    {{ chart.name }}
+                </a>
+            </small>
+        </div>
+    </div>
+{% endmacro %}

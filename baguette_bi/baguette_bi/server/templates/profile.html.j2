@@ -1,0 +1,81 @@
+{% extends "base.html.j2" %}
+
+{% set username = user.username %}
+{% set email = user.email if user.email %}
+{% set first_name = user.first_name if user.first_name %}
+{% set middle_name = user.middle_name if user.middle_name %}
+{% set last_name = user.last_name if user.last_name %}
+{% set full_name = [last_name, first_name, middle_name]|join(" ") %}
+{% set role = "Viewer" %}
+{% set role = "Editor" if user.is_editor %}
+{% set role = "Admin" if user.is_admin %}
+{% set signup_dt = user.created_at.strftime('%Y-%m-%d') %}
+{% set charts = user.charts if user.charts %}
+{% set bookmarks = user.bookmarks if user.bookmarks %}
+
+{% block title %}
+
+    <title>My Profile | Baguette BI</title>
+
+{% endblock %}
+
+
+{% block content %}
+
+    <div class="d-flex flex-wrap justify-content-between">
+
+        <div class="card col-lg-3 col-md-5 col-sm-12 col-12 mb-5">
+            <h6 class="card-header">
+                <i class="bi bi-person extra-spacing"></i> {{ username }}
+            </h6>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item"><span class="fw-bold">Role:</span> {{ role }}</li>
+                {% if email %}
+                    <li class="list-group-item"><span class="fw-bold">Email:</span> {{ email }}</li>
+                {% endif %}
+                {% if first_name %}
+                    <li class="list-group-item"><span class="fw-bold">Name:</span> {{ full_name }}</li>
+                {% endif %}
+                <li class="list-group-item"><span class="fw-bold">Signed Up:</span> {{ signup_dt }}</li>
+            </ul>
+        </div>
+
+        <div class="card col-lg-4 col-md-6 col-sm-12 col-12 mb-5">
+            <h6 class="card-header">
+                <i class="bi bi-bookmarks extra-spacing"></i> My bookmarks
+            </h6>
+            {% if bookmarks %}
+                <ul class="list-group list-group-flush">
+                    {% for b in bookmarks %}
+                        <a href="{{ url_for('chart_page', pk=b['id']) }}" class="list-group-item list-group-item-action">{{ b['name'] }}</a>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item disabled" aria-disabled="true">No bookmarks found.</li>
+                </ul>
+            {% endif %}
+        </div>
+
+        <div class="card col-lg-4 col-md-5 col-sm-12 col-12 mb-5">
+            <h6 class="card-header">
+                <i class="bi bi-gear extra-spacing"></i> Maintained by me
+            </h6>
+            {% if charts %}
+                <ul class="list-group list-group-flush">
+                    {% for c in charts %}
+                    <a href="{{ url_for('chart_page', pk=c['id']) }}" class="list-group-item list-group-item-action">{{ c['name'] }}</a>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item disabled" aria-disabled="true">No charts found.</li>
+                </ul>
+            {% endif %}
+        </div>
+
+    </div>
+
+
+{% endblock %}
+

@@ -1,0 +1,32 @@
+{% extends "base.html.j2" %}
+{% import "macros.html.j2" as macros with context %}
+
+{% block title %}
+    <title>{{ chart.name }} | Baguette BI</title>
+{% endblock %}
+
+{% block head %}
+    {% if chart.rendering_engine == "vega-lite" %}
+        {% include "elements/vega-imports.html.j2" %}
+        <script src="{{ url_for('static', path='js/vega-chart.js') }}"></script>
+    {% endif %}
+    <script src="{{ url_for('static', path='js/toggle-bookmark.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+
+    {{ macros.chart_breadcrumbs(chart) }}
+
+    <div class="loader" id="loader"></div>
+    <div class="row text-center">
+        <div id="chart"></div>
+    </div>
+
+
+    <script>
+        const chartId = {{ chart.id | tojson | safe }};
+        mountChart(chartId);
+    </script>
+
+
+{% endblock %}

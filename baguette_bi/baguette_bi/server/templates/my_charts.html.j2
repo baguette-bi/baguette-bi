@@ -1,0 +1,24 @@
+{% extends "tree.html.j2" %}
+{% import "macros.html.j2" as macros with context %}
+
+{% block title %}
+    <title>My bookmarks | Baguette BI</title>
+{% endblock %}
+
+{% block content %}
+
+    <div class="d-flex flex-wrap">
+
+        {% if not charts %}
+            <div class="alert alert-info" role="alert">
+                No charts to display here. Consider publishing more charts or check existing chart permissions.
+            </div>
+        {% else %}
+            {% for c in charts %}
+                {{ macros.display_chart(c) }}
+            {% endfor %}
+        {% endif %}
+
+    </div>
+
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends "base.html.j2" %}
+{% import "macros.html.j2" as macros with context %}
+
+{% set folder_name = folder.name if folder else 'Root' %}
+
+{% block title %}
+    <title>{{ folder_name }} | Baguette BI</title>
+{% endblock %}
+
+{% block content %}
+
+    {% if folder %}
+        {{ macros.folder_breadcrumbs(folder) }}
+    {% endif %}
+
+    <div class="d-flex flex-wrap">
+
+        {% for f in folders %}
+            {{ macros.display_folder(f) }}
+        {% endfor %}
+
+        {% for c in charts %}
+            {{ macros.display_chart(c) }}
+        {% endfor %}
+
+        {% if not charts and not folders %}
+            <div class="alert alert-info" role="alert">
+                No charts to display here. Consider publishing more charts or check existing chart permissions.
+            </div>
+        {% endif %}
+
+    </div>
+
+{% endblock %}
