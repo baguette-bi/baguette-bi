@@ -7,7 +7,7 @@ from starlette.middleware.sessions import SessionMiddleware
 from baguette_bi.server import api, static, views
 from baguette_bi.settings import settings
 
-static_dir = Path(static.__file__).parent.resolve() / "static"
+static_dir = Path(static.__file__).parent.resolve()
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory=static_dir), name="static")

@@ -1,11 +1,12 @@
 from pathlib import Path
 from typing import Dict
-from unittest.mock import MagicMock
 
 from fastapi import Request
 from fastapi.templating import Jinja2Templates
 
-templates_dir = Path(__file__).parent.parent.resolve() / "templates"
+from baguette_bi.server import templates
+
+templates_dir = Path(templates.__file__).parent.resolve()
 j2 = Jinja2Templates(directory=str(templates_dir))
 
 

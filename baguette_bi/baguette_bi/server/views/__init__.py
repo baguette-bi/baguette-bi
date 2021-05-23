@@ -1,7 +1,8 @@
 from typing import Callable
 
-from baguette_bi.server.project import project
 from fastapi import APIRouter, Depends, HTTPException, status
+
+from baguette_bi.server.project import project
 
 from .utils import templates
 

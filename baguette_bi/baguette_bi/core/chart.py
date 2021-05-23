@@ -34,7 +34,7 @@ class Chart(metaclass=ChartMeta):
     def rendered_to_dict(self, obj) -> Dict:
         raise NotImplementedError
 
-    def get_definition(self, ctx: RenderContext):
+    def get_rendered(self, ctx: RenderContext) -> chart_cls:
         sig = inspect.signature(self.render)
         kwargs = {}
         for name, par in sig.parameters.items():
@@ -44,7 +44,10 @@ class Chart(metaclass=ChartMeta):
                 kwargs[name] = ctx.parameters[name].value
             else:
                 raise ValueError(f"Parameter {name} not found")
-        obj = self.render(**kwargs)
+        return self.render(**kwargs)
+
+    def get_definition(self, ctx: RenderContext):
+        obj = self.get_rendered(ctx)
         return self.rendered_to_dict(obj)
 
 
