@@ -1,6 +1,8 @@
+import os
+from pathlib import Path
+
 import typer
 import uvicorn
-
 
 app = typer.Typer()
 
@@ -13,5 +15,6 @@ def version():
 
 
 @app.command()
-def server(reload: bool = False):
-    uvicorn.run("baguette_bi.server.app:app", reload=reload)
+def server(project: Path, reload: bool = False):
+    os.environ["BAGUETTE_PROJECT"] = str(project)
+    uvicorn.run("baguette_bi.server.app:app", reload=reload, reload_dirs=[str(project)])

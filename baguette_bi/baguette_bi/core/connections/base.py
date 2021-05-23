@@ -3,9 +3,9 @@ from typing import Callable
 
 from jinja2 import Template
 
-from ..data_request import DataRequest
-from ..dataset import Dataset
-from ..secret import SecretDict
+from baguette_bi.core.data_request import DataRequest
+from baguette_bi.core.dataset import Dataset
+from baguette_bi.core.secret import SecretDict
 
 
 def execute_wrapper(fn: Callable):

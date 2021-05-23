@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "baguette_bi"
-version = "0.1.0"
+version = "0.1.2"
 description = ""
 authors = ["Mikhail Akimov <rovinj.akimov@gmail.com>"]
 
@@ -24,6 +24,9 @@ flake8 = "^3.9.2"
 isort = "^5.8.0"
 mkdocs = "^1.1.2"
 pytest-cov = "^2.12.0"
+
+[tool.poetry.scripts]
+baguette = "baguette_bi.cli:app"
 
 [tool.pytest.ini_options]
 addopts = "--cov-report xml --cov-report html --cov=baguette_bi"
