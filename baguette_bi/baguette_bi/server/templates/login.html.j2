@@ -6,16 +6,18 @@
 
 {% block content %}
 
-    <form class="form col-4 mx-auto" method="post" name="login">
+<div class="col-3 mx-auto">
+    <form action="/login/" method="post">
         <div class="mb-3">
-            <label for="username" class="form-label">Username:</label>
-            <input type="text" class="form-control" id="username" name="username">
+            <label for="username" class="form-label">Username</label>
+            <input id="username" name="username" type="text" class="form-control">
         </div>
         <div class="mb-3">
-            <label for="password" class="form-label">Password:</label>
-            <input type="password" class="form-control" id="password" name="password">
+            <label for="password" class="form-label">Password</label>
+            <input id="password" name="password" type="password" class="form-control">
         </div>
-        <input type="submit" class="btn btn-primary" value="Sign In">
+        <button type="submit" class="btn btn-primary">Log In</button>
     </form>
+</div>
 
 {% endblock %}

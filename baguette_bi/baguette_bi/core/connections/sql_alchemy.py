@@ -28,7 +28,7 @@ class SQLAlchemyConnection(Connection):
             database=database,
         )
         self._engine = None
-        self.url = URL(**self.details)
+        self.url = URL.create(**self.details)
 
     @property
     def engine(self):

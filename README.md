@@ -58,17 +58,17 @@ That's it! You define how to get the data, you define what to do with it to get 
 
 These things are not implemented yet, but will be in the future (in rough order of importance):
 
-- Tools for development in Jupyter notebooks
-- Authentication and user permissions
 - Chart previews in the web interface
 - Docs beyond a meager README file
 - Parametrization of charts and datasets
 - Correct locale handling for Altair
+- Dashboards (layouts of many charts) as first-class citizens
 - Support of other libraries (Bokeh, etc.)
 
-# Releases
+# Release notes
 
 ## 0.1.3
 
+- Authentication and user permissions
 - this README
 - bi.test for rendering charts in Jupyter

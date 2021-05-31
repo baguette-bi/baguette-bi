@@ -1,10 +1,13 @@
 {% extends "base.html.j2" %}
 {% import "macros.html.j2" as macros with context %}
 
-{% set folder_name = folder.name if folder else 'Root' %}
-
 {% block title %}
-    <title>{{ folder_name }} | Baguette BI</title>
+    <title>
+    {% if folder %}
+    {{ folder.name }}&nbsp;|&nbsp;
+    {% endif %}
+    {{ title }}
+    </title>
 {% endblock %}
 
 {% block content %}

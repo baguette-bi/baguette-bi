@@ -1,7 +1,7 @@
 from typing import List
 
-from .base import Base
-from .chart import ChartList
+from baguette_bi.schema.base import Base
+from baguette_bi.server.schema.chart import ChartList
 
 
 class BaseFolder(Base):

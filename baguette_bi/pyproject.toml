@@ -6,7 +6,7 @@ authors = ["Mikhail Akimov <rovinj.akimov@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-fastapi = "^0.65.1"
+fastapi = {extras = ["dotenv"], version = "^0.65.1"}
 SQLAlchemy = "^1.4.15"
 typer = "^0.3.2"
 itsdangerous = "^2.0.1"
@@ -16,6 +16,10 @@ vega-datasets = "^0.9.0"
 uvicorn = "^0.13.4"
 aiofiles = "^0.7.0"
 psycopg2-binary = "^2.8.6"
+passlib = { extras = ["bcrypt"], version = "^1.7.4" }
+WTForms = "^2.3.3"
+python-multipart = "^0.0.5"
+python-dotenv = "^0.17.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.4"

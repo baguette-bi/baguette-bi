@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from . import charts, folders, info
+from baguette_bi.server.api import charts, folders, info
 
 router = APIRouter()
 router.include_router(charts.router, prefix="/charts")

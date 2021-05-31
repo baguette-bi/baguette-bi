@@ -46,10 +46,14 @@ def postgres_in_docker(port=5432):
 
 @pytest.fixture(scope="session")
 def db():
+    from baguette_bi.server.models.base import Base
+
     with postgres_in_docker() as uri:
         engine = create_engine(uri)
+        Base.metadata.create_all(engine)
         Session = sessionmaker(bind=engine)
-        yield Session()
+        session = Session()
+        yield session
 
 
 @pytest.fixture(scope="session")

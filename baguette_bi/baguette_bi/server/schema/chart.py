@@ -1,4 +1,4 @@
-from .base import Base
+from baguette_bi.schema.base import Base
 
 
 class BaseChart(Base):

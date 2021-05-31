@@ -1,9 +1,9 @@
 from typing import Any, List, Literal, Optional, Union
 
-from baguette_bi.core.parameters import allowed_types
 from pydantic import validator
 
-from .base import Base
+from baguette_bi.core.parameters import allowed_types
+from baguette_bi.server.schema.base import Base
 
 
 class BaseParameter(Base):
