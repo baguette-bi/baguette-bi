@@ -6,13 +6,12 @@ from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 
 from baguette_bi.server import api, settings, startup, static, views
-from baguette_bi.server.views.exc import WebException
+from baguette_bi.server.exc import WebException
 
 static_dir = Path(static.__file__).parent.resolve()
 
-startup.run()
-
 app = FastAPI()
+app.on_event("startup")(startup.run)
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
 app.add_middleware(

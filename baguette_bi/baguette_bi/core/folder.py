@@ -1,6 +1,8 @@
 import json
 from hashlib import md5
+from typing import List
 
+from baguette_bi.core.chart import Chart
 from baguette_bi.core.permissions import Permissions
 
 
@@ -12,12 +14,10 @@ class Folder:
         permissions: str = Permissions.inherit,
     ):
         self.name = name
-        self.children = []
-        self.charts = []
+        self.children: List[Folder] = []
+        self.charts: List[Chart] = []
         self.parent = parent
         self.permissions = permissions
-        if parent is not None:
-            parent.children.append(self)
         self.id = md5(json.dumps(self.dict()).encode("UTF-8")).hexdigest()
 
     def dict(self):

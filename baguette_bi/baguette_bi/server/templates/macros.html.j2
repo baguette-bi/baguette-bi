@@ -1,24 +1,27 @@
 {% macro folder_breadcrumbs_link(folder, active=False) %}
-    {% set name = folder.name if folder else "🥖" %}
     {% set href = url_for("folder_page", pk=folder.id) if folder else url_for("index") %}
 
     {% if active %}
-        {{ name }}
+        {{ folder.name }}
     {% else %}
         <a class="{{ 'text-decoration-none' if not folder else '' }}" href="{{ href }}">
-            {{ name }}
+            {{ folder.name }}
         </a>
     {% endif %}
 {% endmacro %}
 
 
 {% macro folder_breadcrumbs_items(folder, active=True) %}
-    {% if folder %}
+    {% if folder.parent %}
         {{ folder_breadcrumbs_items(folder.parent, active=False) }}
+        <li class="breadcrumb-item{{ ' active' if active else '' }}">
+            {{ folder_breadcrumbs_link(folder, active=active) }}
+        </li>
+    {% else %}
+        <li class="breadcrumb-item">
+            <a class="text-decoration-none" href={{ url_for("index") }}>{{ icon }}</a>
+        </li>
     {% endif %}
-    <li class="breadcrumb-item{{ ' active' if active else '' }}">
-        {{ folder_breadcrumbs_link(folder, active=active) }}
-    </li>
 {% endmacro %}
 
 

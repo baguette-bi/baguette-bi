@@ -20,21 +20,12 @@ async function postJSON(url, data) {
 
 
 async function mountChart(id) {
-    const defn = await postJSON(`/api/charts/${id}/render/`, {});
-    const vw = await vegaEmbed("#chart", defn);
-
-    console.log(chart);
-
+    const res = await postJSON(`/api/charts/${id}/render/`, {});
+    if (typeof(res.traceback) !== "undefined") {
+        console.log(res.traceback);
+        alert("Error loading chart, please contact server administrator.");
+    } else {
+        const vw = await vegaEmbed("#chart", res);
+    }
     document.getElementById("loader").remove();
-    // const init = {
-    //     credentials: "same-origin"
-    // }
-    // const preview = await vw.view.toImageURL("png");
-    // await fetch(`/api/charts/${id}/preview/`, Object.assign({
-    //     method: "POST",
-    //     body: JSON.stringify({ preview }),
-    //     headers: {
-    //         "Content-Type": "application/json",
-    //     },
-    // }, init));
 }

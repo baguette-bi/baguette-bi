@@ -3,7 +3,7 @@
 
 {% block title %}
     <title>
-    {% if folder %}
+    {% if folder.parent %}
     {{ folder.name }}&nbsp;|&nbsp;
     {% endif %}
     {{ title }}
@@ -12,21 +12,21 @@
 
 {% block content %}
 
-    {% if folder %}
-        {{ macros.folder_breadcrumbs(folder) }}
+    {% if folder.parent %}
+    {{ macros.folder_breadcrumbs(folder) }}
     {% endif %}
 
     <div class="d-flex flex-wrap">
 
-        {% for f in folders %}
+        {% for f in folder.children %}
             {{ macros.display_folder(f) }}
         {% endfor %}
 
-        {% for c in charts %}
+        {% for c in folder.charts %}
             {{ macros.display_chart(c) }}
         {% endfor %}
 
-        {% if not charts and not folders %}
+        {% if not folder.charts and not folder.children %}
             <div class="alert alert-info" role="alert">
                 No charts to display here. Consider publishing more charts or check existing chart permissions.
             </div>

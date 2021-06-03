@@ -6,8 +6,8 @@ from fastapi.responses import RedirectResponse
 
 from baguette_bi.core import User
 from baguette_bi.server import security
-from baguette_bi.server.project import Forbidden, NotFound, project
-from baguette_bi.server.views.exc import WebException
+from baguette_bi.server.exc import BaguetteException
+from baguette_bi.server.project import Project, get_project
 from baguette_bi.server.views.utils import templates
 
 router = APIRouter()
@@ -17,37 +17,37 @@ router = APIRouter()
 def handle_project_exceptions():
     try:
         yield
-    except NotFound:
-        raise WebException(status.HTTP_404_NOT_FOUND)
-    except Forbidden:
-        raise WebException(status.HTTP_403_FORBIDDEN)
+    except BaguetteException as exc:
+        exc.raise_for_view()
 
 
 @router.get("/")
 def index(
-    render: Callable = Depends(templates), user: User = Depends(security.maybe_user)
+    render: Callable = Depends(templates),
+    project: Project = Depends(get_project),
+    user: User = Depends(security.maybe_user),
 ):
     with handle_project_exceptions():
         root = project.get_root(user)
-        return render("tree.html.j2", dict(charts=root.charts, folders=root.children))
+        return render("tree.html.j2", dict(folder=root))
 
 
 @router.get("/folders/{pk}/")
 def folder_page(
     pk: str,
+    project: Project = Depends(get_project),
     user: User = Depends(security.maybe_user),
     render: Callable = Depends(templates),
 ):
     with handle_project_exceptions():
         folder = project.get_folder(pk, user)
-        return render(
-            "tree.html.j2", dict(charts=folder.charts, folders=folder.children)
-        )
+        return render("tree.html.j2", dict(folder=folder))
 
 
 @router.get("/charts/{pk}/")
 def chart_page(
     pk: str,
+    project: Project = Depends(get_project),
     user: User = Depends(security.maybe_user),
     render: Callable = Depends(templates),
 ):

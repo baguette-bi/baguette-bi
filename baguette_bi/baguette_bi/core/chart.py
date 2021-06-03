@@ -17,6 +17,11 @@ class ChartMeta(type):
     def __hash__(self) -> int:
         return hash(id(self))
 
+    @property
+    def parent(self):
+        """For permissions"""
+        return self.folder
+
 
 class Chart(metaclass=ChartMeta):
     id = None
@@ -43,11 +48,6 @@ class Chart(metaclass=ChartMeta):
             else:
                 raise ValueError(f"Parameter {name} not found")
         return self.render(**kwargs)
-
-    @property
-    def parent(self):
-        """For permissions"""
-        return self.folder
 
     def get_definition(self, ctx: context.RenderContext):
         obj = self.get_rendered(ctx)

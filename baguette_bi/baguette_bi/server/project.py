@@ -4,12 +4,14 @@ import pkgutil
 import sys
 from contextlib import contextmanager
 from dataclasses import dataclass
+from functools import cache
 from pathlib import Path
 from typing import Dict, Optional
 
 from baguette_bi.core import AltairChart, Folder, Permissions, User
 from baguette_bi.core.chart import Chart
 from baguette_bi.server import settings
+from baguette_bi.server.exc import Forbidden, NotFound
 
 
 @contextmanager
@@ -61,25 +63,17 @@ def is_user(obj):
 def check_permissions(obj, user: Optional[User]):
     if obj.permissions == Permissions.public or not settings.auth:
         return True
+    if obj.permissions == Permissions.inherit:
+        return check_permissions(obj.parent, user)
     if user is None:
         return False
     if user.is_admin:
         return True
     if obj.permissions == Permissions.authenticated:
-        return user.username is not None
+        return True
     if isinstance(obj.permissions, (list, set)):
         return any(user.username == u.username for u in obj.permissions)
-    if obj.permissions == Permissions.inherit:
-        return check_permissions(obj.parent, user)
     return False
-
-
-class Forbidden(Exception):
-    pass
-
-
-class NotFound(Exception):
-    pass
 
 
 @dataclass
@@ -90,6 +84,7 @@ class Project:
     users: Dict[str, User]
 
     @classmethod
+    @cache  # import only once
     def import_path(cls, path: Path) -> "Project":
         root = Folder("__root__", permissions=settings.root_permissions)
         folders = {}
@@ -98,11 +93,15 @@ class Project:
         for module in _import_path(path):
             for _, folder in inspect.getmembers(module, is_folder):
                 folders[folder.id] = folder
+                if folder.parent is not None and folder not in folder.parent.children:
+                    folder.parent.children.append(folder)
                 if folder.parent is None and folder not in root.children:
+                    folder.parent = root
                     root.children.append(folder)
             for _, chart in inspect.getmembers(module, is_chart):
-                charts[chart.id] = chart()
+                charts[chart.id] = chart
                 if chart.folder is None and chart not in root.charts:
+                    chart.folder = root
                     root.charts.append(chart)
             for _, user in inspect.getmembers(module, is_user):
                 users[user.username] = user
@@ -138,4 +137,6 @@ class Project:
         raise Forbidden
 
 
-project = Project.import_path(settings.project)
+@cache
+def get_project():
+    return Project.import_path(settings.project)

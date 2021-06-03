@@ -1,0 +1,5 @@
+site_name: Baguette BI
+theme:
+  name: material
+  logo: assets/logo.svg
+  favicon: assets/logo.svg
