@@ -1,6 +1,6 @@
 # Baguette BI
 
-Baguette BI is an Open Source Business Intelligence web framework. It is made for teams who love code and care about version control, testing and reproducibility.
+Baguette BI is a  Business Intelligence web framework. It is made for teams who love code and care about version control, testing and reproducibility.
 
 Baguette is made to solve a particular set of problems very common within BI teams. They usually involve some version of this scenario: "someone changed something and now everything is broken". This is strange, because this isn't a problem in "normal" software engineering. Programmers test their code and are able to catch such problems before they reach the production environment.
 
@@ -28,10 +28,11 @@ vega = bi.VegaDatasetsConnection()
 # for SQL-based connection it will be an SQL query,
 # for MongoDB a query dict, for VegaDatasetsConnection it's just a name of the dataset
 movies = vega.dataset(name="Movies", query="movies")
-
+my_folder = bi.Folder(name="MyFolder)
 
 class MoviesChart(bi.AltairChart):
     name = "My First Altair Chart"  # you can skip this and Baguette will generate a nice-looking name from the class name
+    folder = my_folder
 
     # render method can "request" different resources,
     # namely datasets and parameters. Baguette will make sure
@@ -51,8 +52,7 @@ class MoviesChart(bi.AltairChart):
         )
 ```
 
-That's it! You define how to get the data, you define what to do with it to get the visualization that you want. Baguette handles everything else.
-
+If baguette package is installed, you can run this file with `baguette server example.py`. Then go to `localhost:8000`, and you should see a folder with a chart in it.
 
 # Roadmap
 
