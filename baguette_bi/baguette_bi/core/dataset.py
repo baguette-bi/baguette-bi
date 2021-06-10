@@ -32,6 +32,9 @@ class DatasetMeta(type):
         cls.id = f"{cls.__module__}.{name}"
         super().__init__(name, bases, attrs)
 
+    def __hash__(self):
+        return hash(id(self))
+
 
 class Dataset(metaclass=DatasetMeta):
 

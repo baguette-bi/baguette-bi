@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Boolean, Column, Integer, String
 
 from baguette_bi.server import crypto
 from baguette_bi.server.models.base import Base
@@ -7,10 +7,11 @@ from baguette_bi.server.models.base import Base
 class User(Base):
     username = Column(String, primary_key=True)
     password_hash = Column(String, nullable=False)
+    is_admin = Column(Boolean, nullable=False, default=False)
+
     email = Column(String)
     first_name = Column(String)
-    last_name = Column(String)
-    something = Column(String)
+    middle_name = Column(String)
 
     session_counter = Column(Integer, nullable=False, default=0)
 

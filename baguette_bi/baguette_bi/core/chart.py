@@ -14,7 +14,6 @@ class ChartMeta(type):
 
 class Chart(metaclass=ChartMeta):
     id = None
-    name = None
     rendering_engine = None
 
     def render(self):

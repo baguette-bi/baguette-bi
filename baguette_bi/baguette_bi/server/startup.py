@@ -1,9 +1,6 @@
-from contextlib import contextmanager
 from pathlib import Path
 
-from baguette_bi.server import models, settings, static
-from baguette_bi.server.db import get_db
-from baguette_bi.server.project import get_project
+from baguette_bi.server import static
 
 
 def print_ascii():
