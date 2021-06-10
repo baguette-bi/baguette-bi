@@ -21,8 +21,8 @@ app.add_middleware(
     max_age=settings.session_max_age,
 )
 
-app.include_router(api.router, prefix="/api")
 app.include_router(views.router)
+app.include_router(api.router, prefix="/api")
 
 
 @app.exception_handler(WebException)

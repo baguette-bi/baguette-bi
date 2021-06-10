@@ -6,12 +6,12 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 from functools import cache
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Dict
 
-from baguette_bi.core import AltairChart, Dataset, Folder, Permissions, User
+from baguette_bi.core import AltairChart, Dataset
 from baguette_bi.core.chart import Chart
 from baguette_bi.server import settings
-from baguette_bi.server.exc import Forbidden, NotFound
+from baguette_bi.server.exc import NotFound
 from baguette_bi.server.templating import Environment, pages
 
 
@@ -53,105 +53,37 @@ def is_chart(obj):
     )
 
 
-def is_folder(obj):
-    return isinstance(obj, Folder)
-
-
-def is_user(obj):
-    return isinstance(obj, User)
-
-
 def is_dataset(obj):
     return inspect.isclass(obj) and issubclass(obj, Dataset) and obj is not Dataset
 
 
-def check_permissions(obj, user: Optional[User]):
-    if obj.permissions == Permissions.public or not settings.auth:
-        return True
-    if obj.permissions == Permissions.inherit:
-        return check_permissions(obj.parent, user)
-    if user is None:
-        return False
-    if user.is_admin:
-        return True
-    if obj.permissions == Permissions.authenticated:
-        return True
-    if isinstance(obj.permissions, (list, set)):
-        return any(user.username == u.username for u in obj.permissions)
-    return False
-
-
 @dataclass
 class Project:
-    root: Folder
-    folders: Dict[str, Folder]
     datasets: Dict[str, Dataset]
     charts: Dict[str, Chart]
-    users: Dict[str, User]
     pages: Environment
 
     @classmethod
     @cache  # import only once
     def import_path(cls, path: Path) -> "Project":
-        root = Folder("__root__", permissions=settings.root_permissions)
-        folders = {}
         charts = {}
-        users = {}
         datasets = {}
         for module in _import_path(path):
-            for _, folder in inspect.getmembers(module, is_folder):
-                folders[folder.id] = folder
-                if folder.parent is not None and folder not in folder.parent.children:
-                    folder.parent.children.append(folder)
-                if folder.parent is None and folder not in root.children:
-                    folder.parent = root
-                    root.children.append(folder)
             for _, chart in inspect.getmembers(module, is_chart):
                 charts[chart.id] = chart
-                if chart.folder is None and chart not in root.charts:
-                    chart.folder = root
-                    root.charts.append(chart)
             for _, dataset in inspect.getmembers(module, is_dataset):
                 datasets[dataset.id] = dataset
-            for _, user in inspect.getmembers(module, is_user):
-                users[user.username] = user
         return cls(
-            root=root,
-            folders=folders,
             charts=charts,
-            users=users,
             pages=pages,
             datasets=datasets,
         )
 
-    def get_root(self, user: Optional[User]):
-        if check_permissions(self.root, user):
-            f = Folder(self.root.name, permissions=self.root.permissions)
-            f.charts = [c for c in self.root.charts if check_permissions(c, user)]
-            f.children = [c for c in self.root.children if check_permissions(c, user)]
-            return f
-        raise Forbidden
-
-    def get_folder(self, pk: str, user: Optional[User]):
-        folder = self.folders.get(pk)
-        if folder is None:
-            raise NotFound
-        if check_permissions(folder, user):
-            f = Folder(
-                folder.name, parent=folder.parent, permissions=folder.permissions
-            )
-            f.charts = [c for c in folder.charts if check_permissions(c, user)]
-            f.children = [c for c in folder.children if check_permissions(c, user)]
-            return f
-        raise Forbidden
-
-    def get_chart(self, pk: str, user: Optional[User]):
+    def get_chart(self, pk: str):
         chart = self.charts.get(pk)
         if chart is None:
             raise NotFound
-        if check_permissions(chart, user):
-            return chart
-        raise Forbidden
+        return chart
 
 
 @cache

@@ -15,7 +15,7 @@ pages = Environment(
 
 
 def make_pages_link(path, params=None):
-    abspath = urljoin("/pages/", path)
+    abspath = urljoin("/", path)
     _params = params if params is not None else {}
     qs = urlencode(_params)
     return f"{abspath}?{qs}"

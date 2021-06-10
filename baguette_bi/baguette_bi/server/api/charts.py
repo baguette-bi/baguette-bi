@@ -4,8 +4,7 @@ from contextlib import contextmanager
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 
-from baguette_bi.core import User
-from baguette_bi.server import schema, security
+from baguette_bi.server import schema
 from baguette_bi.server.exc import BaguetteException
 from baguette_bi.server.project import Project, get_project
 
@@ -20,26 +19,14 @@ def handle_project_exceptions():
         exc.raise_for_api()
 
 
-@router.get("/{pk}/", response_model=schema.ChartRead)
-def read_chart(
-    pk: str,
-    project: Project = Depends(get_project),
-    user: User = Depends(security.maybe_user),
-):
-    with handle_project_exceptions():
-        chart = project.get_chart(pk, user)
-        return schema.ChartRead.from_orm(chart)
-
-
 @router.post("/{pk}/render/")
 def render_chart(
     pk: str,
     render_context: schema.RenderContext,
     project: Project = Depends(get_project),
-    user: User = Depends(security.maybe_user),
 ):
     with handle_project_exceptions():
-        chart = project.get_chart(pk, user)()
+        chart = project.get_chart(pk)()
         try:
             return chart.get_definition(render_context)
         except Exception:

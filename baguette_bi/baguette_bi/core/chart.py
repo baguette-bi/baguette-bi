@@ -1,34 +1,21 @@
 import inspect
 from typing import Dict
 
-from baguette_bi.core import context, dataset, utils
-from baguette_bi.core.permissions import Permissions
+from baguette_bi.core import context, dataset
 
 
 class ChartMeta(type):
     def __init__(cls, name, bases, attrs):
         cls.id = f"{cls.__module__}.{name}"
-        if cls.name is None and not cls.__module__.startswith("baguette_bi.core."):
-            cls.name = utils.class_to_name(name)
-        if cls.folder is not None:
-            cls.folder.charts.append(cls)
 
     def __hash__(self) -> int:
         return hash(id(self))
-
-    @property
-    def parent(self):
-        """For permissions"""
-        return self.folder
 
 
 class Chart(metaclass=ChartMeta):
     id = None
     name = None
-    folder = None
     rendering_engine = None
-
-    permissions = Permissions.inherit
 
     def render(self):
         raise NotImplementedError

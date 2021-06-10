@@ -5,7 +5,6 @@ from jinja2 import Template
 
 from baguette_bi.core.data_request import DataRequest
 from baguette_bi.core.dataset import Dataset
-from baguette_bi.core.secret import SecretDict
 
 
 def execute_wrapper(fn: Callable):
@@ -25,10 +24,10 @@ class Connection(metaclass=ConnectionMeta):
     type: str = None
 
     def __init__(self, **details):
-        self.details = SecretDict(details)
+        self.details = details
 
     def dict(self):
-        return {"type": self.type, "details": self.details.dict()}
+        return {"type": self.type, "details": self.details}
 
     def transform_request(self, request: DataRequest):
         request.query = Template(request.query).render(**request.parameters)

@@ -2,7 +2,6 @@ from pathlib import Path
 
 from pydantic import BaseSettings
 
-from baguette_bi.core.permissions import Permissions
 from baguette_bi.examples import docs
 
 
@@ -13,7 +12,6 @@ class Settings(BaseSettings):
     auth: bool = False
     session_max_age: int = 3600 * 24  # 24 hours
     secret_key: str = "secret"
-    root_permissions: Permissions = Permissions.authenticated
     database_url: str = "sqlite:///baguette.db"
     default_admin_password: str = "baguette"
 

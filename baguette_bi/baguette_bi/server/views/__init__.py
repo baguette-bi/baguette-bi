@@ -1,61 +1,58 @@
-from contextlib import contextmanager
-from typing import Callable
+from types import SimpleNamespace
+from typing import Callable, Dict
 
-from fastapi import APIRouter, Depends, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import RedirectResponse
+from jinja2.exceptions import TemplateNotFound
+from markdown import Markdown
 
-from baguette_bi.core import User
+from baguette_bi.core.context import RenderContext
 from baguette_bi.server import security
-from baguette_bi.server.exc import BaguetteException
 from baguette_bi.server.project import Project, get_project
-from baguette_bi.server.views import pages
-from baguette_bi.server.views.utils import templates
+from baguette_bi.server.views.utils import template_context, templates
 
 router = APIRouter()
-router.include_router(pages.router, prefix="/pages")
 
+md = Markdown(extensions=["fenced_code", "toc"])
 
-@contextmanager
-def handle_project_exceptions():
-    try:
-        yield
-    except BaguetteException as exc:
-        exc.raise_for_view()
+router = APIRouter()
 
 
 @router.get("/")
 def index(
-    render: Callable = Depends(templates),
+    request: Request,
     project: Project = Depends(get_project),
-    user: User = Depends(security.maybe_user),
-):
-    with handle_project_exceptions():
-        root = project.get_root(user)
-        return render("tree.html.j2", folder=root)
-
-
-@router.get("/folders/{pk}/")
-def folder_page(
-    pk: str,
-    project: Project = Depends(get_project),
-    user: User = Depends(security.maybe_user),
+    context: Dict = Depends(template_context),
     render: Callable = Depends(templates),
 ):
-    with handle_project_exceptions():
-        folder = project.get_folder(pk, user)
-        return render("tree.html.j2", folder=folder)
+    return get_page(
+        "index.md", project=project, context=context, render=render, request=request
+    )
 
 
-@router.get("/charts/{pk}/")
-def chart_page(
-    pk: str,
+@router.get("/{path:path}")
+def get_page(
+    path: str,
+    request: Request,
     project: Project = Depends(get_project),
-    user: User = Depends(security.maybe_user),
+    context: Dict = Depends(template_context),
     render: Callable = Depends(templates),
 ):
-    with handle_project_exceptions():
-        chart = project.get_chart(pk, user)
-        return render("chart.html.j2", chart=chart)
+    try:
+        template = project.pages.get_template(path)
+    except TemplateNotFound:
+        raise HTTPException(404)
+    if template is None:
+        raise HTTPException(404)
+    context.update(
+        {
+            "DataFrame": _get_dataframe(project, request.query_params),
+            "params": SimpleNamespace(**request.query_params),
+            "page": path,
+        }
+    )
+    page = md.convert(template.render(context))
+    return render("pages.html.j2", page=page)
 
 
 @router.get("/login/")
@@ -72,3 +69,11 @@ def post_login():
 def get_logout(request: Request):
     request.session["username"] = ""
     return RedirectResponse(request.url_for("get_login"))
+
+
+def _get_dataframe(project: Project, parameters: Dict):
+    def DataFrame(name: str):
+        dataset = project.datasets[name]()
+        return dataset.get_data(RenderContext(parameters=parameters))
+
+    return DataFrame

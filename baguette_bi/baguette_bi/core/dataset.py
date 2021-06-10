@@ -1,16 +1,15 @@
-from typing import Any, Protocol
+from typing import Any, Dict, Protocol
 
 import pandas as pd
 import pydantic
 
 from baguette_bi.core.context import RenderContext
 from baguette_bi.core.data_request import DataRequest
-from baguette_bi.core.secret import SecretDict
 
 
 class Connectable(Protocol):
     type: str
-    params: SecretDict
+    params: Dict
 
     def store(self, identifier: str, df: pd.DataFrame):
         """Store a dataframe"""

@@ -1,11 +1,9 @@
 import pandas as pd
-from sqlalchemy import text
 from sqlalchemy.engine import create_engine
 from sqlalchemy.engine.url import URL
 
+from baguette_bi.core.connections.base import Connection
 from baguette_bi.core.data_request import DataRequest
-
-from .base import Connection
 
 
 class SQLAlchemyConnection(Connection):
