@@ -7,6 +7,10 @@ from baguette_bi.server.models.base import Base
 class User(Base):
     username = Column(String, primary_key=True)
     password_hash = Column(String, nullable=False)
+    email = Column(String)
+    first_name = Column(String)
+    last_name = Column(String)
+    something = Column(String)
 
     session_counter = Column(Integer, nullable=False, default=0)
 

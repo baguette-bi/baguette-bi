@@ -1,4 +1,5 @@
 import pandas as pd
+from sqlalchemy import text
 from sqlalchemy.engine import create_engine
 from sqlalchemy.engine.url import URL
 
@@ -37,4 +38,4 @@ class SQLAlchemyConnection(Connection):
         return self._engine
 
     def execute(self, req: DataRequest) -> pd.DataFrame:
-        return pd.read_sql(req.query, self.engine)
+        return pd.read_sql(req.query, self.engine, params=req.parameters)

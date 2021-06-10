@@ -1,6 +1,7 @@
 from baguette_bi.actions import test
 from baguette_bi.core import (
     AltairChart,
+    Dataset,
     Folder,
     Secret,
     SQLAlchemyConnection,
@@ -16,4 +17,5 @@ __all__ = [
     "Secret",
     "User",
     "test",
+    "Dataset",
 ]

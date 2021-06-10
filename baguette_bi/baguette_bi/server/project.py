@@ -8,10 +8,11 @@ from functools import cache
 from pathlib import Path
 from typing import Dict, Optional
 
-from baguette_bi.core import AltairChart, Folder, Permissions, User
+from baguette_bi.core import AltairChart, Dataset, Folder, Permissions, User
 from baguette_bi.core.chart import Chart
 from baguette_bi.server import settings
 from baguette_bi.server.exc import Forbidden, NotFound
+from baguette_bi.server.templating import Environment, pages
 
 
 @contextmanager
@@ -60,6 +61,10 @@ def is_user(obj):
     return isinstance(obj, User)
 
 
+def is_dataset(obj):
+    return inspect.isclass(obj) and issubclass(obj, Dataset) and obj is not Dataset
+
+
 def check_permissions(obj, user: Optional[User]):
     if obj.permissions == Permissions.public or not settings.auth:
         return True
@@ -80,8 +85,10 @@ def check_permissions(obj, user: Optional[User]):
 class Project:
     root: Folder
     folders: Dict[str, Folder]
+    datasets: Dict[str, Dataset]
     charts: Dict[str, Chart]
     users: Dict[str, User]
+    pages: Environment
 
     @classmethod
     @cache  # import only once
@@ -90,6 +97,7 @@ class Project:
         folders = {}
         charts = {}
         users = {}
+        datasets = {}
         for module in _import_path(path):
             for _, folder in inspect.getmembers(module, is_folder):
                 folders[folder.id] = folder
@@ -103,9 +111,18 @@ class Project:
                 if chart.folder is None and chart not in root.charts:
                     chart.folder = root
                     root.charts.append(chart)
+            for _, dataset in inspect.getmembers(module, is_dataset):
+                datasets[dataset.id] = dataset
             for _, user in inspect.getmembers(module, is_user):
                 users[user.username] = user
-        return cls(root=root, folders=folders, charts=charts, users=users)
+        return cls(
+            root=root,
+            folders=folders,
+            charts=charts,
+            users=users,
+            pages=pages,
+            datasets=datasets,
+        )
 
     def get_root(self, user: Optional[User]):
         if check_permissions(self.root, user):

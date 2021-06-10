@@ -34,16 +34,13 @@ class Connection(metaclass=ConnectionMeta):
         request.query = Template(request.query).render(**request.parameters)
         return request
 
-    def execute(self, request: DataRequest):
-        raise NotImplementedError
-
     def dataset(
         self,
         name: str,
         query: str,
         storage_connection: "Connection" = None,
         refresh_interval: int = None,
-    ):
+    ) -> Dataset:
         return Dataset(
             name=name,
             query=query,
@@ -51,3 +48,6 @@ class Connection(metaclass=ConnectionMeta):
             storage_connection=storage_connection,
             refresh_interval=refresh_interval,
         )
+
+    def execute(self, request: DataRequest):
+        raise NotImplementedError

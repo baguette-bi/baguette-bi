@@ -1,5 +1,4 @@
 import inspect
-from hashlib import md5
 from typing import Dict
 
 from baguette_bi.core import context, dataset, utils
@@ -8,7 +7,7 @@ from baguette_bi.core.permissions import Permissions
 
 class ChartMeta(type):
     def __init__(cls, name, bases, attrs):
-        cls.id = md5(f"{cls.__module__}.{name}".encode("UTF-8")).hexdigest()
+        cls.id = f"{cls.__module__}.{name}"
         if cls.name is None and not cls.__module__.startswith("baguette_bi.core."):
             cls.name = utils.class_to_name(name)
         if cls.folder is not None:
@@ -41,12 +40,8 @@ class Chart(metaclass=ChartMeta):
         sig = inspect.signature(self.render)
         kwargs = {}
         for name, par in sig.parameters.items():
-            if isinstance(par.default, dataset.Dataset):
-                kwargs[name] = par.default.get_data(ctx)
-            elif name in ctx.parameters:
-                kwargs[name] = ctx.parameters[name].value
-            else:
-                raise ValueError(f"Parameter {name} not found")
+            if isinstance(par.default, dataset.DatasetMeta):
+                kwargs[name] = par.default().get_data(ctx)
         return self.render(**kwargs)
 
     def get_definition(self, ctx: context.RenderContext):

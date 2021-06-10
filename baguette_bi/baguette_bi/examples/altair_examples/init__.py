@@ -1,6 +1,7 @@
 import altair as alt
-from baguette_bi import bi
 from pandas import DataFrame
+
+from baguette_bi import bi
 
 from . import datasets
 from .case_studies import *  # NOQA: F401, F403
@@ -34,6 +35,7 @@ class Streamgraph(bi.AltairChart):
     folder = root
 
     def render(self, source: DataFrame = datasets.unemployment_across_industries):
+        sel = alt.selection_single(on="mouseover")
         return (
             alt.Chart(source)
             .mark_area()
@@ -44,7 +46,8 @@ class Streamgraph(bi.AltairChart):
                 ),
                 alt.Y("sum(count):Q", stack="center", axis=None),
                 alt.Color("series:N", scale=alt.Scale(scheme="category20b")),
+                opacity=alt.condition(sel, alt.value(1), alt.value(0.3)),
             )
-            .properties(width=900, height=300)
-            .interactive()
+            .add_selection(sel)
+            .properties(width="container", height=300)
         )

@@ -1,8 +1,12 @@
 import os
 from pathlib import Path
+from typing import Optional
 
+import alembic
 import typer
 import uvicorn
+
+from baguette_bi.examples import altair_examples, docs
 
 app = typer.Typer()
 
@@ -15,6 +19,15 @@ def version():
 
 
 @app.command()
-def server(project: Path, reload: bool = False):
+def server(project: Optional[Path] = typer.Argument(None), reload: bool = False):
+    if project is None:
+        project = Path(altair_examples.__file__).parent
+    os.environ["BAGUETTE_PROJECT"] = str(project)
+    uvicorn.run("baguette_bi.server.app:app", reload=reload, reload_dirs=[str(project)])
+
+
+@app.command(name="docs")
+def docs_cmd(reload: bool = False):
+    project = Path(docs.__file__).parent
     os.environ["BAGUETTE_PROJECT"] = str(project)
     uvicorn.run("baguette_bi.server.app:app", reload=reload, reload_dirs=[str(project)])

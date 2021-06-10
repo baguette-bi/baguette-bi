@@ -1,0 +1,31 @@
+{% macro link(path, text) %}<a class="text-decoration-none" href="{{ path | make_pages_link(kwargs) }}">{{ text }}</a>{% endmacro %}
+
+{% macro chart(name) %}
+<div class="pages-chart my-5" data-chart="{{ name }}"></div>
+{% endmacro %}
+
+{% macro row() %}
+<div class="pages-row d-flex flex-wrap justify-content-around">
+{{ caller() }}
+</div>
+{% endmacro %}
+
+{% macro big_number(text, title, subtitle=none, size=36) %}
+<div class="big-number my-3">
+    <p class="text-center">{{ title }}</p>
+    <p class="text-center" style="font-size: {{ size }}px">{{ text }}</p>
+    {% if subtitle is not none %}
+    <p class="text-center" style="color: gray">{{ subtitle }}</p>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{% macro big_inline(content) %}<big>{{ content }}</big>{% endmacro %}
+
+{% macro strong_inline(content) %}<strong>{{ content }}</strong>{% endmacro %}
+
+{% macro small_inline(content) %}<small>{{ content }}</small>{% endmacro %}
+
+{% macro small_muted_inline(content) %}<small class="text-muted">{{ content }}</small>{% endmacro %}
+
+{% macro wrap_in_paren(content) %}({{ content }}){% endmacro %}

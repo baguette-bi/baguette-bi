@@ -8,9 +8,11 @@ from baguette_bi.core import User
 from baguette_bi.server import security
 from baguette_bi.server.exc import BaguetteException
 from baguette_bi.server.project import Project, get_project
+from baguette_bi.server.views import pages
 from baguette_bi.server.views.utils import templates
 
 router = APIRouter()
+router.include_router(pages.router, prefix="/pages")
 
 
 @contextmanager
@@ -29,7 +31,7 @@ def index(
 ):
     with handle_project_exceptions():
         root = project.get_root(user)
-        return render("tree.html.j2", dict(folder=root))
+        return render("tree.html.j2", folder=root)
 
 
 @router.get("/folders/{pk}/")
@@ -41,7 +43,7 @@ def folder_page(
 ):
     with handle_project_exceptions():
         folder = project.get_folder(pk, user)
-        return render("tree.html.j2", dict(folder=folder))
+        return render("tree.html.j2", folder=folder)
 
 
 @router.get("/charts/{pk}/")
@@ -53,7 +55,7 @@ def chart_page(
 ):
     with handle_project_exceptions():
         chart = project.get_chart(pk, user)
-        return render("chart.html.j2", dict(chart=chart))
+        return render("chart.html.j2", chart=chart)
 
 
 @router.get("/login/")

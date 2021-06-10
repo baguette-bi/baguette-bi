@@ -1,8 +1,6 @@
-from typing import Dict
-
-from .parameters import Parameter
+from typing import Any, Dict
 
 
 class RenderContext:
-    def __init__(self, parameters: Dict[str, Parameter]):
-        self.parameters = parameters
+    def __init__(self, parameters: Dict[str, Any] = None):
+        self.parameters = parameters if parameters is not None else {}

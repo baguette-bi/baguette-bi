@@ -10,7 +10,7 @@ from baguette_bi.server.exc import WebException
 
 static_dir = Path(static.__file__).parent.resolve()
 
-app = FastAPI()
+app = FastAPI(debug=settings.debug)
 app.on_event("startup")(startup.run)
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
 

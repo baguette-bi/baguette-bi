@@ -1,0 +1,43 @@
+{% macro something() %}
+<p>Something!</p>
+{% endmacro %}
+
+<!doctype html>
+<html>
+    <head>
+        {% block title %}
+            <title>{{ title }}</title>
+        {% endblock %}
+
+        {% block head %}
+
+        {% endblock %}
+
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>{{ icon }}</text></svg>">
+        <link rel="stylesheet" href="{{ url_for('static', path='css/bootstrap.min.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', path='css/bootstrap-icons.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', path='css/base.css') }}">
+        <link rel="stylesheet"
+            href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.0.1/styles/default.min.css">
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.0.1/highlight.min.js"></script>
+        {% include "elements/vega-imports.html.j2" %}
+        <script src="{{ url_for('static', path='js/vega-chart.js') }}"></script>
+    </head>
+
+    <body>
+        {% include "elements/sidebar.html.j2" %}
+
+        <main>
+            <div class="container-md mt-3" style="max-width: 960px; padding: 0 87px;">
+                {{ page | safe }}
+
+                <div style="height: 100px"></div>
+            </div>
+        </main>
+
+        <script src="{{ url_for('static', path='js/bootstrap.bundle.min.js') }}"></script>
+        <script>mountAllCharts();</script>
+        <script>hljs.highlightAll();</script>
+    </body>
+
+</html>

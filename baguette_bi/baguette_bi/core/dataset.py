@@ -1,12 +1,11 @@
-import json
-from hashlib import md5
-from typing import Protocol
+from typing import Any, Protocol
 
 import pandas as pd
+import pydantic
 
-from .context import RenderContext
-from .data_request import DataRequest
-from .secret import SecretDict
+from baguette_bi.core.context import RenderContext
+from baguette_bi.core.data_request import DataRequest
+from baguette_bi.core.secret import SecretDict
 
 
 class Connectable(Protocol):
@@ -26,29 +25,28 @@ class Connectable(Protocol):
         """Delete stored data."""
 
 
-class Dataset:
-    def __init__(
-        self,
-        name: str,
-        query: str,
-        connection: Connectable,
-        storage_connection: Connectable = None,
-        refresh_interval: int = None,
-    ):
-        self.id = md5(
-            json.dumps({"query": query, "connection": connection.dict()}).encode(
-                "UTF-8"
-            )
-        ).hexdigest()
-        self.name = name
-        self.query = query
-        self.connection = connection
-        self.storage_connection = storage_connection
-        self.refresh_interval = refresh_interval
+class DatasetMeta(type):
+    def __init__(cls, name, bases, attrs):
+        cls.__parameters_model__ = pydantic.dataclasses.dataclass(
+            cls.Parameters
+        ).__pydantic_model__
+        cls.id = f"{cls.__module__}.{name}"
+        super().__init__(name, bases, attrs)
 
-    def get_data(self, render_context: RenderContext):
-        request = DataRequest(query=self.query)
-        return self.connection.execute(request)
 
-    def __hash__(self) -> int:
-        return hash(id(self))
+class Dataset(metaclass=DatasetMeta):
+
+    connection: Connectable = None
+    query: Any = None
+
+    class Parameters:
+        pass
+
+    def get_data(self, render_context: RenderContext) -> pd.DataFrame:
+        parameters = self.__parameters_model__.parse_obj(render_context.parameters)
+        request = DataRequest(query=self.query, parameters=parameters.dict())
+        df = self.connection.execute(request)
+        return self.transform(df)
+
+    def transform(self, df: pd.DataFrame) -> pd.DataFrame:
+        return df

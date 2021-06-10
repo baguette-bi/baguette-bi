@@ -1,9 +1,6 @@
-const fetchData = (chartId, vegaView) => async([id, dataset]) => {
-    console.log(dataset);
-    const res = await fetch(`/api/charts/${chartId}/datasets/${id}/data/`, { method: "POST" })
-    const values = await res.json()
-    console.log(values);
-    vegaView.insert(id, values);
+function getParams() {
+    const params = new URLSearchParams(document.location.search);
+    return Object.fromEntries(params.entries())
 }
 
 
@@ -19,13 +16,27 @@ async function postJSON(url, data) {
 }
 
 
-async function mountChart(id) {
-    const res = await postJSON(`/api/charts/${id}/render/`, {});
+async function mountChart(id, el) {
+    const res = await postJSON(`/api/charts/${id}/render/`, { parameters: getParams() });
     if (typeof(res.traceback) !== "undefined") {
         console.log(res.traceback);
         alert("Error loading chart, please contact server administrator.");
     } else {
-        const vw = await vegaEmbed("#chart", res);
+        await vegaEmbed(el, res, { actions: false });
     }
-    document.getElementById("loader").remove();
+    const loader = document.getElementById("loader");
+    if (loader !== null) {
+        loader.remove();
+    }
+}
+
+function mountAllCharts() {
+    const chartDivs = document.querySelectorAll(".pages-chart");
+    Promise.all(
+        [...chartDivs].map(el => {
+            return mountChart(el.dataset.chart, el);
+        })
+    ).then(() => {
+        console.log("all mounted!");
+    })
 }
