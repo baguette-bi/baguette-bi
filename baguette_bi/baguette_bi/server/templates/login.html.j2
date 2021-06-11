@@ -5,19 +5,14 @@
 {% endblock %}
 
 {% block content %}
-
-<div class="col-3 mx-auto">
-    <form action="/login/" method="post">
-        <div class="mb-3">
-            <label for="username" class="form-label">Username</label>
-            <input id="username" name="username" type="text" class="form-control">
-        </div>
-        <div class="mb-3">
-            <label for="password" class="form-label">Password</label>
-            <input id="password" name="password" type="password" class="form-control">
-        </div>
-        <button type="submit" class="btn btn-primary">Log In</button>
-    </form>
-</div>
-
+{% include "elements/login.html.j2" %}
 {% endblock %}
+
+{% block bottom %}
+<script>
+const login = document.querySelector("#login-submit");
+login.addEventListener("click", () => {
+    document.querySelector("#login-form").submit();
+});
+</script>
+{% endblock bottom %}

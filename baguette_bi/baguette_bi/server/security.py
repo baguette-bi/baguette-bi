@@ -1,35 +1,32 @@
 from typing import Optional
 
-from fastapi import Depends, Form, Request
+from fastapi import Depends, Form, Request, status
 
-from baguette_bi.server import models, settings
+from baguette_bi.exc import Unauthorized
+from baguette_bi.server import exc, models, settings
 from baguette_bi.server.db import Session, get_db
-from baguette_bi.server.exc import Unauthorized
 from baguette_bi.server.project import Project, get_project
 
 
 def check_credentials(
     username: str = Form(...),
     password: str = Form(...),
-    project: Project = Depends(get_project),
     db: Session = Depends(get_db),
-):
+) -> models.User:
     user: models.User = db.query(models.User).get(username)
-    if user is None or user.username not in project.users:
+    if user is None or not user.check_password(password):
         Unauthorized().raise_for_view()
-    if user.check_password(password):
-        return project.users.get(user.username)
-    Unauthorized().raise_for_view()
+    return user
 
 
 def do_login(request: Request, user: models.User = Depends(check_credentials)):
     request.session["username"] = user.username
+    request.session["counter"] = user.session_counter
     return user
 
 
 def maybe_user(
     request: Request,
-    project: Project = Depends(get_project),
     db: Session = Depends(get_db),
 ):
     if not settings.auth:
@@ -37,16 +34,27 @@ def maybe_user(
     username = request.session.get("username")
     if username is None:
         return None
-    db_user: models.User = db.query(models.User).get(username)
-    if db_user is None or db_user.username not in project.users:
+    user: models.User = db.query(models.User).get(username)
+    counter = request.session.get("counter")
+    try:
+        counter = int(counter)
+    except ValueError:
         return None
-    user = project.users.get(db_user.username)
-    if not user.is_active:
+    if (
+        user is None
+        or counter is None
+        or not user.is_active
+        or counter != user.session_counter
+    ):
         return None
     return user
 
 
-def current_user(user: Optional[models.User] = Depends(maybe_user)):
-    if user is None:
-        Unauthorized().raise_for_api()
-    return user
+def authenticated(user: models.User = Depends(maybe_user)):
+    if settings.auth and user is None:
+        raise exc.WebException(status.HTTP_401_UNAUTHORIZED)
+
+
+def authenticated_api(user: models.User = Depends(maybe_user)):
+    if settings.auth and user is None:
+        raise exc.APIException(status.HTTP_401_UNAUTHORIZED)

@@ -1,4 +1,3 @@
-from baguette_bi.actions import test
 from baguette_bi.core import (
     AltairChart,
     Dataset,
@@ -10,6 +9,5 @@ __all__ = [
     "VegaDatasetsConnection",
     "SQLAlchemyConnection",
     "AltairChart",
-    "test",
     "Dataset",
 ]

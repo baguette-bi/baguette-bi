@@ -8,7 +8,6 @@ from baguette_bi.core.connections.base import (
     execute_wrapper,
 )
 from baguette_bi.core.data_request import DataRequest
-from baguette_bi.core.dataset import DatasetMeta
 
 
 def test_execute_wrapper():

@@ -1,5 +1,5 @@
 from types import SimpleNamespace
-from typing import Callable, Dict
+from typing import Callable, Dict, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import RedirectResponse
@@ -7,7 +7,7 @@ from jinja2.exceptions import TemplateNotFound
 from markdown import Markdown
 
 from baguette_bi.core.context import RenderContext
-from baguette_bi.server import security
+from baguette_bi.server import models, security, settings
 from baguette_bi.server.project import Project, get_project
 from baguette_bi.server.views.utils import template_context, templates
 
@@ -18,7 +18,7 @@ md = Markdown(extensions=["fenced_code", "toc"])
 router = APIRouter()
 
 
-@router.get("/")
+@router.get("/", dependencies=[Depends(security.authenticated)])
 def index(
     request: Request,
     project: Project = Depends(get_project),
@@ -30,7 +30,7 @@ def index(
     )
 
 
-@router.get("/{path:path}")
+@router.get("/pages/{path:path}", dependencies=[Depends(security.authenticated)])
 def get_page(
     path: str,
     request: Request,
@@ -56,7 +56,13 @@ def get_page(
 
 
 @router.get("/login/")
-def get_login(render: Callable = Depends(templates)):
+def get_login(
+    request: Request,
+    render: Callable = Depends(templates),
+    user: Optional[models.User] = Depends(security.maybe_user),
+):
+    if not settings.auth or user is not None:
+        return RedirectResponse(request.url_for("index"), status.HTTP_302_FOUND)
     return render("login.html.j2")
 
 

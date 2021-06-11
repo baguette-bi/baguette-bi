@@ -15,7 +15,7 @@ pages = Environment(
 
 
 def make_pages_link(path, params=None):
-    abspath = urljoin("/", path)
+    abspath = urljoin("/pages/", path)
     _params = params if params is not None else {}
     qs = urlencode(_params)
     return f"{abspath}?{qs}"
@@ -31,25 +31,43 @@ def _fmt(round: int, sep: bool):
     return whl, dec
 
 
-def format_percent(num, round: int = 0, thousands_separator: bool = True):
+def format_percent(
+    num, round: int = 0, thousands_separator: bool = True, locale=settings.locale
+):
     whl, dec = _fmt(round, thousands_separator)
     fmt = f"{whl}.{dec}%"
-    return numbers.format_percent(num, format=fmt, locale=settings.locale)
+    return numbers.format_percent(num, format=fmt, locale=locale)
 
 
-def format_number(num, round=0, thousands_separator=True):
+def format_number(
+    num, round=0, format=None, thousands_separator=True, locale=settings.locale
+):
     whl, dec = _fmt(round, thousands_separator)
-    fmt = f"{whl}.{dec}"
-    return numbers.format_decimal(num, format=fmt, locale=settings.locale)
+    fmt = f"{whl}.{dec}" if format is None else format
+    return numbers.format_decimal(num, format=fmt, locale=locale)
 
 
-def format_date(dt, format="medium"):
-    return dates.format_date(dt, format=format, locale=settings.locale)
+def format_currency(num, currency="USD", currency_digits=True, locale=settings.locale):
+    return numbers.format_currency(
+        num,
+        currency=currency,
+        currency_digits=currency_digits,
+        locale=locale,
+    )
+
+
+def format_date(dt, format="medium", locale=settings.locale):
+    return dates.format_date(dt, format=format, locale=locale)
 
 
 @pass_context
 def text_strong(context, *args, **kwargs):
     return context["strong_inline"](*args, **kwargs)
+
+
+@pass_context
+def text_em(context, *args, **kwargs):
+    return context["em_inline"](*args, **kwargs)
 
 
 @pass_context
@@ -78,10 +96,14 @@ pages.filters["fpct"] = format_percent
 pages.filters["format_number"] = format_number
 pages.filters["fnum"] = format_number
 
+pages.filters["format_currency"] = format_currency
+pages.filters["fcur"] = format_currency
+
 pages.filters["format_date"] = format_date
 pages.filters["fdate"] = format_date
 
 pages.filters["strong"] = text_strong
+pages.filters["em"] = text_em
 pages.filters["big"] = text_big
 pages.filters["small"] = text_small
 pages.filters["small_muted"] = text_small_muted

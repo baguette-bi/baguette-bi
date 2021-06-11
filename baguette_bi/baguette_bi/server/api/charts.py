@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 
 from baguette_bi.server import schema
-from baguette_bi.server.exc import BaguetteException
+from baguette_bi.server.exc import ServerException
 from baguette_bi.server.project import Project, get_project
 
 router = APIRouter()
@@ -15,7 +15,7 @@ router = APIRouter()
 def handle_project_exceptions():
     try:
         yield
-    except BaguetteException as exc:
+    except ServerException as exc:
         exc.raise_for_api()
 
 
