@@ -32,6 +32,7 @@ def version():
     typer.echo(f"Baguette BI v{__version__}")
 
 
+new = app.command(name="new")(actions.new)
 server = app.command(name="server")(actions.server_run)
 docs_cmd = app.command(name="docs")(actions.docs_run)
 

@@ -1,0 +1,14 @@
+{% set cars = DataFrame("docs.datasets.Cars") %}
+
+# Vega dataset: __Cars__
+
+The dataset contains {{ cars.shape[1] | big | strong }} columns and
+{{ cars.shape[0] | big | strong }} rows.
+
+## Dataset summary
+
+{{ cars.describe() | table(max_rows=None) }}
+
+## Horsepowers
+
+{{ chart("docs.charts.tutorial.CarsHorsePowerHistogram") }}

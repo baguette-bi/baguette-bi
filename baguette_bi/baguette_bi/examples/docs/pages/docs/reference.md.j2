@@ -1,12 +1,28 @@
-# 🤔 Baguette BI Reference
+{% include "header.md.j2" %}
 
-This is a non-exhautive list of everything that can be done in Baguette BI. Before reading
+# 🤔 Pages Reference
+
+This is a non-exhautive list of everything that can be done in Baguette BI pages. In
+short, pages are built with Markdown and Jinja2. First, the template is resolved and then,
+the resulting Markdown document is converted to HTML.
+
+Before reading
 this, make sure you're familiar with
 [Markdown syntax](https://daringfireball.net/projects/markdown/)
 and
 [Jinja2 templating language](https://jinja.palletsprojects.com/).
 
 [TOC]
+
+## Working with datasets
+
+For the most part, you will build your pages by interacting with Pandas DataFrames.
+Getting a dataframe inside a page is easy: just call `DataFrame` function and pass an
+`.`-delimited "address" of the dataset class in your package.
+
+```plaintext
+{{ '{{' }}  DataFrame("docs.datasets.basic.Dates") {{ '}}' }}
+```
 
 ## Markdown extensions
 
@@ -35,17 +51,17 @@ extension.
 
 Just type in triple backticks like this:
 
-```plaintext
+```
  ```
  your code
  ```
 ```
 
-Syntax highlighting (courtesy of `highlight.js`) is available. By default, language is
+Syntax highlighting is available. By default, language is
 auto-detected. If you'd like to specity a known programming language, you can specify it
 after the first set of backticks, like this:
 
-```plaintext
+```markdown
  ```python
  import os
 
@@ -63,10 +79,10 @@ something = os.getenv("something")
 print(something, "else")  # comment
 ```
 
-If you'd like to disable highligting, just specify `plaintext` as a language:
+If you'd like to disable highligting, just specify `text` as a language:
 
-```plaintext
- ```plaintext
+```markdown
+ ```text
  import os
 
  something = os.getenv("something")
@@ -138,8 +154,6 @@ Helper filters (and others) can be combined in an arbitrary way:
 
 - {{ 'big and strong' | big | strong }}
 - {{ 'small and em' | small | em }}
-
-For entirely awesome results, combine this with a header:
 
 ```plaintext
 #### {{ '{{' }} 'This header isn\'t supposed to be in TOC' {{ '}}' }} {{ '{{' }} 'it\'s and example' | paren | small_muted {{ '}}' }}

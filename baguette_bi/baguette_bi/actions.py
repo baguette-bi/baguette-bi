@@ -1,4 +1,5 @@
 import os
+import shutil
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Optional
@@ -8,10 +9,18 @@ from sqlalchemy import Table
 from sqlalchemy.exc import IntegrityError
 
 from baguette_bi.examples import docs
+from baguette_bi.examples import new as _new
 from baguette_bi.exc import Conflict, NotFound
 from baguette_bi.server import db, models, settings
 
 get_db = contextmanager(db.get_db)
+
+
+def new(target: Path):
+    if target.exists():
+        raise ValueError(f"{target} already exists")
+    src = Path(_new.__file__).parent
+    shutil.copytree(src, target, ignore=shutil.ignore_patterns("__pycache__"))
 
 
 def drop_all_tables():
@@ -47,15 +56,40 @@ def generate_password(n: int = 12):
     return "".join(secrets.choice(alphabet) for _ in range(n))
 
 
-def server_run(project: Path, reload: bool = False):
+def server_run(
+    project: Path,
+    reload: bool = False,
+    host: str = "127.0.0.1",
+    port: int = 8000,
+):
     os.environ["BAGUETTE_PROJECT"] = str(project)
-    uvicorn.run("baguette_bi.server.app:app", reload=reload, reload_dirs=[str(project)])
+    uvicorn.run(
+        "baguette_bi.server.app:app",
+        reload=reload,
+        reload_dirs=[str(project)],
+        host=host,
+        port=port,
+    )
 
 
-def docs_run(reload: bool = False):
+def docs_run(
+    reload: bool = False,
+    browser: bool = True,
+    host: str = "127.0.0.1",
+    port: int = 8000,
+):
     project = Path(docs.__file__).parent
-    os.environ["BAGUETTE_PROJECT"] = str(project)
-    uvicorn.run("baguette_bi.server.app:app", reload=reload, reload_dirs=[str(project)])
+
+    if browser:
+        import webbrowser
+        from threading import Timer
+
+        t = Timer(
+            interval=3, function=webbrowser.open, args=("http://localhost:8000/",)
+        )
+        t.start()
+
+    server_run(project=project, reload=reload, host=host, port=port)
 
 
 def db_init():

@@ -11,17 +11,8 @@ class Connectable(Protocol):
     type: str
     params: Dict
 
-    def store(self, identifier: str, df: pd.DataFrame):
-        """Store a dataframe"""
-
-    def retrieve(self, identifier: str):
-        """Store a dataframe"""
-
     def execute(self, data_request: DataRequest) -> pd.DataFrame:
         """Execute a query against this connection"""
-
-    def unstore(self, identifier: str):
-        """Delete stored data."""
 
 
 class DatasetMeta(type):

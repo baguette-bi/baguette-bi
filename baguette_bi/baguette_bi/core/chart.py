@@ -28,6 +28,13 @@ class Chart(metaclass=ChartMeta):
         for name, par in sig.parameters.items():
             if isinstance(par.default, dataset.DatasetMeta):
                 kwargs[name] = par.default().get_data(ctx)
+            else:
+                if name not in ctx.parameters and par.default == inspect._empty:
+                    raise ValueError(
+                        f"Missing parameter {name} is required for chart "
+                        f"{self.__class__.__name__}"
+                    )
+                kwargs[name] = ctx.parameters.get(name, par.default)
         return self.render(**kwargs)
 
     def get_definition(self, ctx: context.RenderContext):

@@ -1,0 +1,61 @@
+{% include "header.md.j2" %}
+
+<h1 class="display-1 text-center">🥖 <br> Business Intelligence <br>as code</h1>
+
+<p class="lead text-muted text-center">Baguette BI is a Python framework for Business
+Intelligence. Create beautiful data apps with familiar tools, no web development skills
+required.</p>
+
+<p class="text-center mt-5">
+    <a class="btn btn-primary btn-lg" href="/pages/docs/index">Get started with Baguette BI</a>
+</p>
+
+
+# Wait but why?
+
+{% call grid(3, gap="1rem") %}
+<p class="lead"><mark>It's just Python.</mark> Write reusable code, import, subclass, automate. No more clicking through clunky UIs.</p>
+<p class="lead">Flexible and <mark>powerful data visualization</mark> with Altair (and more library support coming).</p>
+<p class="lead"><mark>User authentication</mark> out of the box. Create and manage users, set passwords. No limits, no licenses.</p>
+<p class="lead"><mark>Scale your data team</mark> easily: version your code, review changes.</p>
+<p class="lead"><mark>Build trust</mark>: test your BI system, know if something is broken before it affects the users.</p>
+<p class="lead">Connect to <mark>various data sources</mark>. SQL with SQLAlchemy, Google Spreadsheets built-in. Easily roll your own.</p>
+<p class="lead">Build your data products with Markdown and Jinja2 formatting helpers, <mark>fall back to HTML and CSS</mark> if absolutely needed.</p>
+{% endcall %}
+
+
+# Get started
+
+Guess what, this website is built with Baguette! You can run it locally with:
+
+```sh
+pip install baguette-bi
+```
+
+```sh
+baguette docs  # this should open your browser, if not, go to localhost:8000
+```
+
+
+# Built with
+
+<style>
+.pages-grid {
+    margin-top: 3em;
+}
+.pages-grid img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+</style>
+
+{% call grid(3, gap="5em") %}
+<div><img height="50" src="https://fastapi.tiangolo.com/img/logo-margin/logo-teal.png"></div>
+<div><img height="50" src="https://jinja.palletsprojects.com/en/3.0.x/_images/jinja-logo.png"></div>
+<div><img height="50" src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Bootstrap_logo.svg/2560px-Bootstrap_logo.svg.png"></div>
+<div><img height="50" src="https://altair-viz.github.io/_static/altair-logo-light.png"></div>
+<div><img height="40" src="https://www.sqlalchemy.org/img/sqla_logo.png"></div>
+<div><img height="50" src="https://typer.tiangolo.com/img/logo-margin/logo-margin-vector.svg"></div>
+{# <div><img height="30" src="https://static.bokeh.org/logos/logotype.svg"></div> #}
+{% endcall %}

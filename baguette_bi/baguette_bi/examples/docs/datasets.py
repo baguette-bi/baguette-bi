@@ -1,8 +1,16 @@
+import pandas as pd
+from vega_datasets import data
+
 from baguette_bi import bi
 
 vega = bi.VegaDatasetsConnection()
 
 
-class UsEmployment(bi.Dataset):
+class Cars(bi.Dataset):
     connection = vega
-    query = "us_employment"
+    query = "cars"
+
+
+class VegaDatasetsList(bi.Dataset):
+    def get_data(self, render_context):
+        return pd.DataFrame(data={"dataset": data.list_datasets()})

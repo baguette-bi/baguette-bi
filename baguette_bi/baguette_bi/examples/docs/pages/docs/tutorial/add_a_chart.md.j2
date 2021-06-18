@@ -1,0 +1,183 @@
+{% include "docs/styles.j2" %}
+
+{% macro nav() %}
+{% call row() %}
+{{ "👈 Format the page" | link("docs/tutorial/format_the_page") }}
+{{ "☝️ Tutorial index" | link("docs/tutorial/index") }}
+{{ "Make parametrized charts 👉" | link("docs/tutorial/make_parametrized_charts") }}
+{% endcall %}
+{% endmacro %}
+
+{{ nav() }}
+
+# 📊 Add a chart
+
+Displaying numbers is nice and all, but BI is all about data visualization, right? Let's
+make a chart then and embed it into our page.
+
+## What's a chart?
+
+A chart is our way to tell Baguette BI how to visualize some data. You get a dataset
+(or several of them) in and get a viz out.
+
+Baguette is _not_ a data visualization framework. There are many Python libraries that
+help you visualize data, and they are great, so we, developers, didn't have to do this
+work again. Baguette helps you connect those libraries to your data and display the
+results inside pages.
+
+Right now, we only support [Altair](https://altair-viz.github.io/), because we found it
+the most flexible, tunable and easy to learn. It's also very similar to Tableau in
+semantics, so hopefully it will help you transition from more traditional BI tools. We're
+working on adding support for more libraries,
+[Bokeh](https://docs.bokeh.org/en/latest/index.html) being the first likely candidate.
+
+A chart is a special class that defines a `render` method. This method is very
+important, because that's where all the magic happens. Inside the render method, you
+tell how your data gets transformed into data visualization. It should return an Altair
+chart.
+
+A chart looks like this:
+
+```python
+from baguette_bi import bi
+
+
+class SomeChart(bi.AltairChart):
+    def render(self):
+        pass  # we'll write some code here and return a chart
+```
+
+## Requesting a dataset to make a chart
+
+You need some data to make a chart. Previously we made a `Cars` dataset, so let's use
+that.
+
+To be able to tell that you need a particlar dataset inside a `render` method, Baguette
+uses a pattern called __dependency injection__. In short, instead of you yourself
+passing a dataset to your chart, you __request__ a dataset. When a user looks at a page
+with an embedded chart, Baguette will make sure that the relevant data is passed to the
+`render` method.
+
+So, how do you request a dataset? You just set a previously defined dataset class as a
+default for an argument in `render`.
+
+That's OK if this explanation seems a little bit too abstract (because it is), let's just
+look at an example.
+
+Here's how we can request our `Cars` dataset:
+
+``` { .python hl_lines="4 8" }
+import pandas as pd
+from baguette_bi import bi
+
+from tutorial.datasets import Cars
+
+
+class CarsHorsePowerHistogram(bi.AltairChart):
+    def render(self, cars: pd.DataFrame = Cars):
+        pass  # the cars variable will be a Pandas dataframe containing our dataset
+```
+
+The type annotation (`: pd.DataFrame`) for the `cars` argument is not required, it is
+just for documentation and your IDE. The name of the argument also doesn't matter, we
+could have named it `llama` or `cottage_cheese`.
+
+## Making a chart in Altair
+
+This is not a tutorial on Altair, so we'll skip the explanations (the code itself is
+pretty self-explanatory). Look at Altair docs if you need to, they are really
+well-written and easy to understand.
+
+Let's add the code that makes a histogram of cars' horsepowers.
+
+``` { .python hl_lines="1 10 11 12 13 14" }
+import altair as alt
+import pandas as pd
+
+from baguette_bi import bi
+from baguette_bi.examples.docs.datasets import Cars
+
+
+class CarsHorsePowerHistogram(bi.AltairChart):
+    def render(self, cars: pd.DataFrame = Cars):
+        return (
+            alt.Chart(cars)
+            .mark_bar()
+            .encode(x=alt.X("Horsepower:Q", bin=True), y="count()")
+        )
+```
+
+So, we just imported Altair and proceeded as usual, like we would do during interactive
+analysis in Jupyter. Take a Pandas DataFrame (or several), define a chart and return it.
+
+## Embedding the chart
+
+To display a chart inside a page, we do something very similar to what we did to get
+a DataFrame. Just call a `chart` function (really, macro, but it doesn't matter) and
+specify a path to your chart in the project. If you put `CarsHorsePowerHistogram` chart
+in `tutorial/charts/__init__.py`, it looks like this:
+
+```jinja
+{% raw %}
+{{ chart("tutorial.charts.CarsHorsePowerHistogram") }}
+{% endraw %}
+```
+
+And the result:
+
+{{ chart("docs.charts.tutorial.CarsHorsePowerHistogram", param1="x", param2=2) }}
+
+
+## Why request datasets?
+
+You could say: _hey, but why do we need all this fancy stuff with dependency injection?
+I can just write something like this!_
+
+```python
+class SomeChart(bi.AltairChart):
+    def render(self):
+        df = read_the_data()
+        other_df = read_other_data()
+        return make_the_chart(df, other_df)
+```
+
+This is true, and Baguette will not prevent you from doing this, but there are several
+benefits to doing it the Baguette way.
+
+First is __separation of concerns__. In a large project, you will have many datasets and
+many charts that will use those datasets in various combinations that you can't predict
+beforehand. It's good to keep the "getting the data" logic separate from
+"displaying the data" logic.
+
+Second, if you request several datasets, Baguette will query them __in parallel__ to
+save time, so you don't have to worry about that yourself.
+
+Third, Baguette will do some __other very useful stuff__ that we'll discuss in a minute.
+
+
+## Add the chart to our page
+
+Here's the final code for our page-in-progress:
+
+```jinja
+{% raw %}
+{% set cars = DataFrame("docs.datasets.Cars") %}
+
+# Vega dataset: __Cars__
+
+The dataset contains {{ cars.shape[1] | big | strong }} columns and
+{{ cars.shape[0] | big | strong }} rows.
+
+## Dataset summary
+
+{{ cars.describe() | table(max_rows=None) }}
+
+## Horsepowers
+
+{{ chart("tutorial.charts.CarsHorsePowerHistogram") }}
+{% endraw %}
+```
+
+<iframe class="embed" src="/pages/docs/tutorial/examples/add_a_chart_1?_embed=" style="height: 50em;"></iframe>
+
+{{ nav() }}
