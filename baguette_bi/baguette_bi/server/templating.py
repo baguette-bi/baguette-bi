@@ -1,5 +1,7 @@
 import inspect
+import json
 from pathlib import Path
+from typing import Dict
 from urllib.parse import urlencode, urljoin
 
 from babel import dates, numbers
@@ -14,11 +16,11 @@ pages = Environment(
 )
 
 
-def make_pages_link(path, params=None):
-    abspath = urljoin("/pages/", path)
-    _params = params if params is not None else {}
-    qs = urlencode(_params)
-    return f"{abspath}?{qs}"
+def to_json(val):
+    return json.dumps(val)
+
+
+inner.filters["to_json"] = to_json
 
 
 def DataFrame(path: str):
@@ -32,32 +34,51 @@ def _fmt(round: int, sep: bool):
 
 
 def format_percent(
-    num, round: int = 0, thousands_separator: bool = True, locale=settings.locale
+    val,
+    round: int = 0,
+    thousands_separator: bool = True,
+    locale=settings.locale,
+    default="N/A",
 ):
+    if val is None:
+        return default
     whl, dec = _fmt(round, thousands_separator)
     fmt = f"{whl}.{dec}%"
-    return numbers.format_percent(num, format=fmt, locale=locale)
+    return numbers.format_percent(val, format=fmt, locale=locale)
 
 
 def format_number(
-    num, round=0, format=None, thousands_separator=True, locale=settings.locale
+    val,
+    round=0,
+    format=None,
+    thousands_separator=True,
+    locale=settings.locale,
+    default="N/A",
 ):
+    if val is None:
+        return default
     whl, dec = _fmt(round, thousands_separator)
     fmt = f"{whl}.{dec}" if format is None else format
-    return numbers.format_decimal(num, format=fmt, locale=locale)
+    return numbers.format_decimal(val, format=fmt, locale=locale)
 
 
-def format_currency(num, currency="USD", currency_digits=True, locale=settings.locale):
+def format_currency(
+    val, currency="USD", currency_digits=True, locale=settings.locale, default="N/A"
+):
+    if val is None:
+        return default
     return numbers.format_currency(
-        num,
+        val,
         currency=currency,
         currency_digits=currency_digits,
         locale=locale,
     )
 
 
-def format_date(dt, format="medium", locale=settings.locale):
-    return dates.format_date(dt, format=format, locale=locale)
+def format_date(val, format="medium", locale=settings.locale, default="N/A"):
+    if val is None:
+        return default
+    return dates.format_date(val, format=format, locale=locale)
 
 
 @pass_context
@@ -71,6 +92,21 @@ def text_em(context, *args, **kwargs):
 
 
 @pass_context
+def text_underline(context, *args, **kwargs):
+    return context["underline_inline"](*args, **kwargs)
+
+
+@pass_context
+def text_strike(context, *args, **kwargs):
+    return context["strike_inline"](*args, **kwargs)
+
+
+@pass_context
+def text_mark(context, *args, **kwargs):
+    return context["mark_inline"](*args, **kwargs)
+
+
+@pass_context
 def text_big(context, *args, **kwargs):
     return context["big_inline"](*args, **kwargs)
 
@@ -81,8 +117,8 @@ def text_small(context, *args, **kwargs):
 
 
 @pass_context
-def text_small_muted(context, *args, **kwargs):
-    return context["small_muted_inline"](*args, **kwargs)
+def text_muted(context, *args, **kwargs):
+    return context["muted_inline"](*args, **kwargs)
 
 
 @pass_context
@@ -104,14 +140,44 @@ pages.filters["fdate"] = format_date
 
 pages.filters["strong"] = text_strong
 pages.filters["em"] = text_em
+pages.filters["underline"] = text_underline
+pages.filters["strike"] = text_strike
 pages.filters["big"] = text_big
 pages.filters["small"] = text_small
-pages.filters["small_muted"] = text_small_muted
+pages.filters["muted"] = text_muted
+pages.filters["mark"] = text_mark
 pages.filters["paren"] = text_paren
 
-
-inner.filters["make_pages_link"] = make_pages_link
 
 pages_macros = inner.get_template("pages_macros.html.j2")
 for name, m in inspect.getmembers(pages_macros.module, lambda m: isinstance(m, Macro)):
     pages.globals[name] = m
+
+
+def pages_url(path: str, params: Dict = None):
+    abspath = urljoin("/pages/", path)
+    _params = params if params is not None else {}
+    qs = urlencode(_params)
+    if qs:
+        qs = f"?{qs}"
+    return f"{abspath}{qs}"
+
+
+def link(text: str, path: str, **params):
+    url = pages_url(path, params)
+    return pages_macros.module.mklink(url, text)
+
+
+pages.filters["link"] = link
+
+
+def table(df, **kwargs):
+    return pages_macros.module.mktable(df, **kwargs)
+
+
+def big_number(*args, **kwargs):
+    return pages_macros.module.mk_big_number(*args, **kwargs)
+
+
+pages.filters["table"] = table
+pages.filters["big_number"] = big_number

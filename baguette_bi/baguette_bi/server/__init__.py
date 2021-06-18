@@ -9,6 +9,9 @@ class Settings(BaseSettings):
     project: str = str(Path(docs.__file__).parent)
     pages_dir: str = "pages"
 
+    server_host: str = "127.0.0.1"
+    server_port: int = 8000
+
     auth: bool = False
     session_max_age: int = 3600 * 24  # 24 hours
     secret_key: str = "secret"

@@ -10,9 +10,19 @@
 
 {% block bottom %}
 <script>
-const login = document.querySelector("#login-submit");
-login.addEventListener("click", () => {
-    document.querySelector("#login-form").submit();
-});
+(() => {
+    const login = document.querySelector("#login-submit");
+    const form = document.querySelector("#login-form");
+    login.addEventListener("click", () => {
+        form.submit();
+    });
+    document.querySelectorAll("#username,#password").forEach(el => {
+        el.addEventListener("keypress", e => {
+            if (e.key === "Enter") {
+                form.submit();
+            }
+        });
+    });
+})();
 </script>
 {% endblock bottom %}

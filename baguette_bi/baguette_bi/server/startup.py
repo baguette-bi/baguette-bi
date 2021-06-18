@@ -14,14 +14,5 @@ def print_ascii():
     print(path.read_text().replace("__version__", __version__))
 
 
-def create_default_admin(db):
-    pass
-
-
-def ensure_admin_user():
-    pass
-
-
 def run():
     print_ascii()
-    ensure_admin_user()

@@ -1,11 +1,7 @@
-from typing import Optional
-
 from fastapi import Depends, Form, Request, status
 
-from baguette_bi.exc import Unauthorized
 from baguette_bi.server import exc, models, settings
 from baguette_bi.server.db import Session, get_db
-from baguette_bi.server.project import Project, get_project
 
 
 def check_credentials(
@@ -15,7 +11,7 @@ def check_credentials(
 ) -> models.User:
     user: models.User = db.query(models.User).get(username)
     if user is None or not user.check_password(password):
-        Unauthorized().raise_for_view()
+        raise exc.WebException(status.HTTP_401_UNAUTHORIZED)
     return user
 
 
@@ -50,7 +46,7 @@ def maybe_user(
     return user
 
 
-def authenticated(user: models.User = Depends(maybe_user)):
+def authenticated(request: Request, user: models.User = Depends(maybe_user)):
     if settings.auth and user is None:
         raise exc.WebException(status.HTTP_401_UNAUTHORIZED)
 

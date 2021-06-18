@@ -1,5 +1,14 @@
+body {
+    font-size: 14pt;
+}
+
 * {
     color: #333;
+}
+
+pre {
+    font-family: 'DejaVu Sans Mono', 'Courier New', Courier, monospace;
+    padding: 1em 0.5em 1em 0.5em;
 }
 
 .login-form {
@@ -29,10 +38,38 @@ h4,
 h5 {
     margin-top: 1.25em;
     margin-bottom: 0.75em;
+    font-weight: 300;
+    color: rgb(75, 75, 75);
 }
 
 a {
     text-decoration: none;
+}
+
+.pages-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-content: stretch;
+}
+
+.pages-sidebar {
+    width: 50pt;
+    border: 1px solid #d9d9d9;
+}
+
+.sidebar {
+    /* border: 1px solid #d9d9d9; */
+}
+
+.sidebar a {
+    color: rgb(75, 75, 75);
+}
+
+.sidebar-logo {
+    background-color: #F8F8F8;
+    width: 50pt;
+    height: 50pt;
 }
 
 .sidebar-button-group {
@@ -42,193 +79,48 @@ a {
 
 .sidebar-button {
     border: 1px solid #d9d9d9;
-    display: table-cell;
-    width: 75px;
-    height: 75px;
-    margin: -0.5px 0 -0.5px 0;
-    color: #474747;
+    /* display: table-cell; */
+    width: 50pt;
+    height: 50pt;
+    margin: -0.5px -0.5px -0.5px -0.5px;
 }
 
 .sidebar-button .bi {
-    font-size: 20px;
+    font-size: 16pt;
 }
 
-.sidebar-logo {
-    background-color: #F8F8F8;
+.pages-page>* {
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .pages-chart {
-    width: 100%;
+    /* override vega-embed class inline-block */
+    display: block!important;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.pages-row {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.pages-grid {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    grid-auto-rows: 1fr;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.big-number {
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
 }
 
 .pages-chart canvas {
     display: block;
-    margin: 0 auto;
-}
-
-.sidebar {
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 75px;
-    /* height: 100vh; */
-    border-right: 1px solid #d9d9d9;
-}
-
-.card {
-    border-radius: 0px;
-}
-
-.chart {
-    border: 1px solid lightgray;
-}
-
-.folder {
-    border: 1px solid lightgray;
-    background-color: #fff;
-    /* Need position to allow stacking of pseudo-elements */
-    position: relative;
-    /* Padding for demo purposes */
-    padding: 0.5em;
-}
-
-.folder::before,
-.folder::after {
-    /* Add shadow to distinguish sheets from one another */
-    box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.15);
-}
-
-.folder::before,
-.folder::after {
-    content: "";
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background-color: #eee;
-}
-
-
-/* Second sheet of paper */
-
-.folder::before {
-    left: 5px;
-    top: 5px;
-    z-index: -1;
-}
-
-
-/* Third sheet of paper */
-
-.folder::after {
-    left: 10px;
-    top: 10px;
-    z-index: -2;
-}
-
-.chart-preview {
-    width: 100%;
-    padding-bottom: 100%;
-    background-size: 100%;
-    background-repeat: no-repeat;
-    background-position: center;
-}
-
-.pull-right {
-    margin: auto;
-}
-
-.chart-preview-placeholder {
-    color: #0b5ea5;
-    width: 100%;
-    padding-bottom: 100%;
-    background-size: 50%;
-    background-repeat: no-repeat;
-    background-position: center;
-}
-
-.navbar-logo {
-    vertical-align: text-bottom;
-    margin-right: 10px;
-}
-
-.bc-breadcrumb {
-    background-color: #e9ecef;
-    border-radius: 0.25rem;
-}
-
-.breadcrumb {
-    margin: 0;
-}
-
-
-/* Move navbar icons slightly away from labels */
-
-extra-spacing {
-    margin-right: 5px;
-}
-
-.loader,
-.loader:before,
-.loader:after {
-    background: #5f5f5f;
-    -webkit-animation: load1 1s infinite ease-in-out;
-    animation: load1 1s infinite ease-in-out;
-    width: 1em;
-    height: 4em;
-}
-
-.loader {
-    color: #5f5f5f;
-    text-indent: -9999em;
-    margin: 88px auto;
-    position: relative;
-    font-size: 11px;
-    -webkit-transform: translateZ(0);
-    -ms-transform: translateZ(0);
-    transform: translateZ(0);
-    -webkit-animation-delay: -0.16s;
-    animation-delay: -0.16s;
-}
-
-.loader:before,
-.loader:after {
-    position: absolute;
-    top: 0;
-    content: '';
-}
-
-.loader:before {
-    left: -1.5em;
-    -webkit-animation-delay: -0.32s;
-    animation-delay: -0.32s;
-}
-
-.loader:after {
-    left: 1.5em;
-}
-
-@-webkit-keyframes load1 {
-    0%,
-    80%,
-    100% {
-        box-shadow: 0 0;
-        height: 4em;
-    }
-    40% {
-        box-shadow: 0 -2em;
-        height: 5em;
-    }
-}
-
-@keyframes load1 {
-    0%,
-    80%,
-    100% {
-        box-shadow: 0 0;
-        height: 4em;
-    }
-    40% {
-        box-shadow: 0 -2em;
-        height: 5em;
-    }
+    margin-left: auto;
+    margin-right: auto;
 }

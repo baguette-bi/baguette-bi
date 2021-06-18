@@ -1,9 +1,16 @@
-{% macro link(path, text) -%}
-<a class="text-decoration-none" href="{{ path | make_pages_link(kwargs) }}">{{ text }}</a>
+{% macro mklink(url, text) -%}
+<a class="text-decoration-none" href="{{ url }}">{{ text }}</a>
 {%- endmacro %}
 
+{% macro mktable(df, max_rows=10, border=0, classes=["table", "table-sm"]) %}
+<div style="overflow-x: scroll;">
+{{ df.to_html(classes=classes, border=border, max_rows=max_rows, **kwargs) | safe }}
+</div>
+{% endmacro %}
+
 {% macro chart(name) %}
-<div class="pages-chart my-5" data-chart="{{ name }}"></div>
+<div class="pages-chart" data-chart="{{ name }}" data-parameters="{{ kwargs | tojson | forceescape }}">
+</div>
 {% endmacro %}
 
 {% macro row() %}
@@ -12,12 +19,18 @@
 </div>
 {% endmacro %}
 
-{% macro big_number(text, title, subtitle=none, size=36) %}
-<div class="big-number my-3">
+{% macro grid(columns=3, gap=0) %}
+<div class="pages-grid" style="grid-template-columns: repeat({{ columns }}, 1fr); grid-gap: {{ gap }};">
+{{ caller() }}
+</div>
+{% endmacro %}
+
+{% macro mk_big_number(text, title, subtitle=none, size=36) %}
+<div class="big-number">
     <p class="text-center">{{ title }}</p>
-    <p class="text-center" style="font-size: {{ size }}px">{{ text }}</p>
+    <p class="text-center" style="font-size: {{ size }}pt">{{ text }}</p>
     {% if subtitle is not none %}
-    <p class="text-center" style="color: gray">{{ subtitle }}</p>
+    <p class="text-center text-muted mb-0">{{ subtitle }}</p>
     {% endif %}
 </div>
 {% endmacro %}
@@ -34,12 +47,24 @@
 <em>{{ content }}</em>
 {%- endmacro %}
 
+{% macro underline_inline(content) -%}
+<u>{{ content }}</u>
+{%- endmacro %}
+
+{% macro strike_inline(content) -%}
+<s>{{ content }}</s>
+{%- endmacro %}
+
 {% macro small_inline(content) -%}
 <small>{{ content }}</small>
 {%- endmacro %}
 
-{% macro small_muted_inline(content) -%}
-<small class="text-muted">{{ content }}</small>
+{% macro muted_inline(content) -%}
+<span class="text-muted">{{ content }}</span>
+{%- endmacro %}
+
+{% macro mark_inline(content) -%}
+<mark>{{ content }}</mark>
 {%- endmacro %}
 
 {% macro wrap_in_paren(content) -%}

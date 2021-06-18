@@ -1,6 +1,11 @@
-function getParams() {
+function getURLParams() {
     const params = new URLSearchParams(document.location.search);
     return Object.fromEntries(params.entries())
+}
+
+
+function getChartParams(el) {
+    return JSON.parse(el.dataset.parameters)
 }
 
 
@@ -17,16 +22,13 @@ async function postJSON(url, data) {
 
 
 async function mountChart(id, el) {
-    const res = await postJSON(`/api/charts/${id}/render/`, { parameters: getParams() });
+    const parameters = Object.assign(getURLParams(), getChartParams(el));
+    const res = await postJSON(`/api/charts/${id}/render/`, { parameters });
     if (typeof(res.traceback) !== "undefined") {
         console.log(res.traceback);
         alert("Error loading chart, please contact server administrator.");
     } else {
         await vegaEmbed(el, res, { actions: false });
-    }
-    const loader = document.getElementById("loader");
-    if (loader !== null) {
-        loader.remove();
     }
 }
 

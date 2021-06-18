@@ -1,19 +1,19 @@
 from types import SimpleNamespace
 from typing import Callable, Dict, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, Request, status
 from fastapi.responses import RedirectResponse
 from jinja2.exceptions import TemplateNotFound
 from markdown import Markdown
 
-from baguette_bi.core.context import RenderContext
-from baguette_bi.server import models, security, settings
+from baguette_bi.core import RenderContext
+from baguette_bi.server import exc, models, security, settings
 from baguette_bi.server.project import Project, get_project
 from baguette_bi.server.views.utils import template_context, templates
 
 router = APIRouter()
 
-md = Markdown(extensions=["fenced_code", "toc"])
+md = Markdown(extensions=["fenced_code", "codehilite", "toc"])
 
 router = APIRouter()
 
@@ -26,7 +26,11 @@ def index(
     render: Callable = Depends(templates),
 ):
     return get_page(
-        "index.md", project=project, context=context, render=render, request=request
+        "index",
+        project=project,
+        context=context,
+        render=render,
+        request=request,
     )
 
 
@@ -39,11 +43,10 @@ def get_page(
     render: Callable = Depends(templates),
 ):
     try:
-        template = project.pages.get_template(path)
+        template = project.pages.get_template(f"{path}.md.j2")
     except TemplateNotFound:
-        raise HTTPException(404)
-    if template is None:
-        raise HTTPException(404)
+        raise exc.WebException(404)
+    _embed = request.query_params._dict.pop("_embed", None) is not None
     context.update(
         {
             "DataFrame": _get_dataframe(project, request.query_params),
@@ -52,7 +55,7 @@ def get_page(
         }
     )
     page = md.convert(template.render(context))
-    return render("pages.html.j2", page=page)
+    return render("pages.html.j2", page=page, _embed=_embed)
 
 
 @router.get("/login/")
@@ -67,8 +70,8 @@ def get_login(
 
 
 @router.post("/login/", dependencies=[Depends(security.do_login)])
-def post_login():
-    return RedirectResponse("/", status_code=status.HTTP_302_FOUND)
+def post_login(request: Request):
+    return RedirectResponse(request.url_for("index"), status_code=status.HTTP_302_FOUND)
 
 
 @router.get("/logout/")
@@ -78,8 +81,9 @@ def get_logout(request: Request):
 
 
 def _get_dataframe(project: Project, parameters: Dict):
-    def DataFrame(name: str):
+    def DataFrame(name: str, **kwargs):
+        ctx = RenderContext(parameters=parameters)
         dataset = project.datasets[name]()
-        return dataset.get_data(RenderContext(parameters=parameters))
+        return dataset.get_data(ctx)
 
     return DataFrame

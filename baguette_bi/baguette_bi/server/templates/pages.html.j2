@@ -5,20 +5,20 @@
 {% endblock %}
 
 {% block head %}
-<link rel="stylesheet" href="{{ url_for('static', path='css/base.css') }}">
-<link rel="stylesheet"
-    href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.0.1/styles/default.min.css">
-<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.0.1/highlight.min.js"></script>
+<link rel="stylesheet" href="{{ url_for('static', path='css/codehilite/solarized.css') }}">
 {% include "elements/vega-imports.html.j2" %}
 <script src="{{ url_for('static', path='js/vega-chart.js') }}"></script>
-{% endblock %}
+{% endblock head %}
 
 {% block content %}
+<div class="pages-page col-sm-12 col-md-10 col-lg-8 col-xl-6 mx-auto">
 {{ page | safe }}
+</div>
+{% if not _embed %}
 <footer style="height: 100px"></div>
+{% endif %}
 {% endblock content %}
 
 {% block bottom %}
 <script>mountAllCharts();</script>
-<script>hljs.highlightAll();</script>
 {% endblock bottom %}
