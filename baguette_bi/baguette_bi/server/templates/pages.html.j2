@@ -20,5 +20,22 @@
 {% endblock content %}
 
 {% block bottom %}
-<script>mountAllCharts();</script>
+<script>
+const urlParams = getURLParams();
+
+// update parameter input values and set event listeners
+document.querySelectorAll(".pages-parameter").forEach(el => {
+    const param = el.dataset.parameter;
+    if (typeof urlParams[param] !== "undefined") {
+        el.value = urlParams[param];
+    }
+    el.addEventListener("change", e => {
+        const params = Object.assign({}, urlParams);
+        params[param] = e.target.value;
+        window.location.search = new URLSearchParams(params);
+    });
+});
+
+mountAllCharts();
+</script>
 {% endblock bottom %}

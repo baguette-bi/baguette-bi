@@ -3,7 +3,6 @@ from typing import Any, Dict, Protocol
 import pandas as pd
 import pydantic
 
-from baguette_bi.core.context import RenderContext
 from baguette_bi.core.data_request import DataRequest
 
 
@@ -35,7 +34,7 @@ class Dataset(metaclass=DatasetMeta):
     class Parameters:
         pass
 
-    def get_data(self, render_context: RenderContext) -> pd.DataFrame:
+    def get_data(self, render_context) -> pd.DataFrame:
         parameters = self.__parameters_model__.parse_obj(render_context.parameters)
         request = DataRequest(query=self.query, parameters=parameters.dict())
         df = self.connection.execute(request)

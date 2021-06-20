@@ -6,6 +6,6 @@
 
 {% call grid() %}
 {% for dataset in datasets["dataset"] %}
-{{ '✨ {}'.format(dataset) | link("summary", dataset_name=dataset) }}
+{{ '✨ {}'.format(dataset) | link("docs/tutorial/examples/final/summary", dataset_name=dataset) }}
 {% endfor %}
 {% endcall %}

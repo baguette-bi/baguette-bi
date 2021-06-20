@@ -1,7 +1,6 @@
-import inspect
 from typing import Dict
 
-from baguette_bi.core import context, dataset
+from baguette_bi.core import context
 
 
 class ChartMeta(type):
@@ -23,19 +22,7 @@ class Chart(metaclass=ChartMeta):
         raise NotImplementedError
 
     def get_rendered(self, ctx: context.RenderContext):
-        sig = inspect.signature(self.render)
-        kwargs = {}
-        for name, par in sig.parameters.items():
-            if isinstance(par.default, dataset.DatasetMeta):
-                kwargs[name] = par.default().get_data(ctx)
-            else:
-                if name not in ctx.parameters and par.default == inspect._empty:
-                    raise ValueError(
-                        f"Missing parameter {name} is required for chart "
-                        f"{self.__class__.__name__}"
-                    )
-                kwargs[name] = ctx.parameters.get(name, par.default)
-        return self.render(**kwargs)
+        return ctx.execute(self.render)
 
     def get_definition(self, ctx: context.RenderContext):
         obj = self.get_rendered(ctx)

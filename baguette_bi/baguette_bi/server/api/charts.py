@@ -1,11 +1,12 @@
 import traceback
 from contextlib import contextmanager
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import JSONResponse
 
+from baguette_bi.core.context import RenderContext
+from baguette_bi.exc import NotFound
 from baguette_bi.server import schema
-from baguette_bi.server.exc import ServerException
 from baguette_bi.server.project import Project, get_project
 
 router = APIRouter()
@@ -15,8 +16,8 @@ router = APIRouter()
 def handle_project_exceptions():
     try:
         yield
-    except ServerException as exc:
-        exc.raise_for_api()
+    except NotFound:
+        raise HTTPException(404)
 
 
 @router.post("/{pk}/render/")
@@ -28,7 +29,7 @@ def render_chart(
     with handle_project_exceptions():
         chart = project.get_chart(pk)()
         try:
-            return chart.get_definition(render_context)
+            return chart.get_definition(RenderContext(**render_context.dict()))
         except Exception:
             tb = traceback.format_exc()
             return JSONResponse({"traceback": tb}, status_code=400)

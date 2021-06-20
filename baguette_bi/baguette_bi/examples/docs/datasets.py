@@ -14,3 +14,11 @@ class Cars(bi.Dataset):
 class VegaDatasetsList(bi.Dataset):
     def get_data(self, render_context):
         return pd.DataFrame(data={"dataset": data.list_datasets()})
+
+
+class AnyVegaDataset(bi.Dataset):
+    connection = vega
+    query = "{{ dataset_name }}"
+
+    class Parameters:
+        dataset_name: str

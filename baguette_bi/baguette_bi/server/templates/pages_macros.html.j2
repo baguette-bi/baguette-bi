@@ -70,3 +70,43 @@
 {% macro wrap_in_paren(content) -%}
 ({{ content }})
 {%- endmacro %}
+
+{% macro parameter_label(parameter, label) %}
+<label for="param-input-{{ parameter }}" class="mb-1">
+    <small class="text-muted">{{ label if label is not none else parameter }}</small>
+</label>
+{% endmacro %}
+
+{% macro input(type, parameter, label=none) %}
+<div>
+{{ parameter_label(parameter, label) }}
+<input id="param-input-{{ parameter }}" type="{{ type }}" class="form-control pages-parameter" data-parameter="{{ parameter }}">
+</div>
+{% endmacro %}
+
+{% macro input_date(parameter, label=none) %}
+{{ input("date", parameter, label)}}
+{% endmacro %}
+
+{% macro input_month(parameter, label=none) %}
+{{ input("month", parameter, label)}}
+{% endmacro %}
+
+{% macro input_datetime(parameter, label=none) %}
+{{ input("datetime-local", parameter, label) }}
+{% endmacro %}
+
+{% macro input_time(parameter, label=none) %}
+{{ input("time", parameter, label) }}
+{% endmacro %}
+
+{% macro input_select(parameter, options, label=none, multiple=False) %}
+<div>
+{{ parameter_label(parameter, label) }}
+<select id="param-input-{{ parameter }}" {{ "multiple" if multiple }} class="form-select pages-parameter" data-parameter="{{ parameter }}">
+{% for option in options %}
+<option value="{{ option }}">{{ option }}</option>
+{% endfor %}
+</select>
+</div>
+{% endmacro %}

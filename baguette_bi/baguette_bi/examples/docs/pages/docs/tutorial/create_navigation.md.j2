@@ -5,7 +5,7 @@
 {% call row() %}
 {{ "👈 Make parametrized charts" | link("docs/tutorial/make_parametrized_charts") }}
 {{ "☝️ Tutorial index" | link("docs/tutorial/index") }}
-{{ "Create a dataset template 👉" | link("docs/tutorial/create_dataset_template") }}
+{{ "Create a dataset template 👉" | link("docs/tutorial/use_parameters_in_a_dataset") }}
 {% endcall %}
 {% endmacro %}
 
@@ -178,7 +178,7 @@ before each link for visual separation
 {% raw %}
 {% call row() %}
 {% for dataset in datasets["dataset"] %}
-{{ ' • {}'.format(dataset) | link("summary", dataset=dataset) }}
+{{ ' • {}'.format(dataset) | link("summary", dataset_name=dataset) }}
 {% endfor %}
 {% endcall %}
 {% endraw %}
@@ -186,7 +186,7 @@ before each link for visual separation
 
 {% call row() %}
 {% for dataset in datasets["dataset"] %}
-{{ ' • {}'.format(dataset) | link("summary", dataset=dataset) }}
+{{ ' • {}'.format(dataset) | link("summary", dataset_name=dataset) }}
 {% endfor %}
 {% endcall %}
 
@@ -199,7 +199,7 @@ Another, likely more readable way to arrange the links (or any content) is using
 {% raw %}
 {% call grid() %}
 {% for dataset in datasets["dataset"] %}
-{{ '✨ {}'.format(dataset) | link("summary", dataset=dataset) }}
+{{ '✨ {}'.format(dataset) | link("summary", dataset_name=dataset) }}
 {% endfor %}
 {% endcall %}
 {% endraw %}
@@ -210,7 +210,7 @@ By default, there will be 3 columns, but you can specify any number as an argume
 
 {% call grid() %}
 {% for dataset in datasets["dataset"] %}
-{{ '✨ {}'.format(dataset) | link("summary", dataset=dataset) }}
+{{ '✨ {}'.format(dataset) | link("summary", dataset_name=dataset) }}
 {% endfor %}
 {% endcall %}
 
@@ -226,13 +226,12 @@ Now, let's look at our final index page:
 
 {% call grid() %}
 {% for dataset in datasets["dataset"] %}
-{{ '✨ {}'.format(dataset) | link("summary", dataset=dataset) }}
+{{ '✨ {}'.format(dataset) | link("summary", dataset_name=dataset) }}
 {% endfor %}
 {% endcall %}
 {% endraw %}
 ```
 
 <iframe class="embed" src="/pages/docs/tutorial/examples/create_navigation_3?_embed=" style="height: 30em;"></iframe>
-
 
 {{ nav() }}
