@@ -3,10 +3,9 @@ from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 
-from baguette_bi.server import api, exc, settings, startup, static, views
+from baguette_bi.server import api, exc, settings, static, views
 
 app = FastAPI(debug=settings.debug)
-app.on_event("startup")(startup.run)
 app.mount("/static", StaticFiles(directory=static.path), name="static")
 
 app.add_middleware(

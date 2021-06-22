@@ -34,6 +34,7 @@ def version():
 
 new = app.command(name="new")(actions.new)
 server = app.command(name="server")(actions.server_run)
+develop = app.command(name="develop")(actions.develop)
 docs_cmd = app.command(name="docs")(actions.docs_run)
 
 

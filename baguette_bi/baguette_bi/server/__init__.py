@@ -9,8 +9,11 @@ class Settings(BaseSettings):
     project: str = str(Path(docs.__file__).parent)
     pages_dir: str = "pages"
 
-    server_host: str = "127.0.0.1"
-    server_port: int = 8000
+    web_host: str = "127.0.0.1"
+    web_port: int = 8000
+    web_daemon: bool = False
+    web_workers: int = 1
+    web_max_requests: int = 0
 
     auth: bool = False
     session_max_age: int = 3600 * 24  # 24 hours

@@ -56,16 +56,23 @@ def generate_password(n: int = 12):
     return "".join(secrets.choice(alphabet) for _ in range(n))
 
 
-def server_run(
+def server_run(project: Path):
+    import subprocess
+
+    os.environ["BAGUETTE_PROJECT"] = str(project)
+    config = Path(__file__).parent / "server" / "gunicorn.conf.py"
+    subprocess.call(["gunicorn", "-c", str(config)])
+
+
+def develop(
     project: Path,
-    reload: bool = False,
     host: str = "127.0.0.1",
     port: int = 8000,
 ):
     os.environ["BAGUETTE_PROJECT"] = str(project)
     uvicorn.run(
         "baguette_bi.server.app:app",
-        reload=reload,
+        reload=True,
         reload_dirs=[str(project)],
         host=host,
         port=port,
