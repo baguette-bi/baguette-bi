@@ -1,0 +1,115 @@
+{% macro mklink(url, text) -%}
+<a class="text-decoration-none" href="{{ url }}">{{ text }}</a>
+{%- endmacro %}
+
+{% macro mktable(df, max_rows=10, border=0, classes=["table", "table-sm"]) %}
+<div style="overflow-x: scroll;">
+{{ df.to_html(classes=classes, border=border, max_rows=max_rows, **kwargs) | safe }}
+</div>
+{% endmacro %}
+
+{% macro chart(name) %}
+<div class="pages-chart"
+     data-chart="{{ name }}"
+     data-parameters="{{ kwargs | tojson | forceescape }}">
+<img class="d-block mx-auto" height="10" src="/static/loader.gif">
+</div>
+{% endmacro %}
+
+{% macro row() %}
+<div class="pages-row d-flex flex-wrap justify-content-around">
+{{ caller() }}
+</div>
+{% endmacro %}
+
+{% macro grid(columns=3, gap=0) %}
+<div class="pages-grid" style="grid-template-columns: repeat({{ columns }}, 1fr); grid-gap: {{ gap }};">
+{{ caller() }}
+</div>
+{% endmacro %}
+
+{% macro mk_big_number(text, title, subtitle=none, size=36) %}
+<div class="big-number">
+    <p class="text-center">{{ title }}</p>
+    <p class="text-center" style="font-size: {{ size }}pt">{{ text }}</p>
+    {% if subtitle is not none %}
+    <p class="text-center text-muted mb-0">{{ subtitle }}</p>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{% macro big_inline(content) -%}
+<big>{{ content }}</big>
+{%- endmacro %}
+
+{% macro strong_inline(content) -%}
+<strong>{{ content }}</strong>
+{%- endmacro %}
+
+{% macro em_inline(content) -%}
+<em>{{ content }}</em>
+{%- endmacro %}
+
+{% macro underline_inline(content) -%}
+<u>{{ content }}</u>
+{%- endmacro %}
+
+{% macro strike_inline(content) -%}
+<s>{{ content }}</s>
+{%- endmacro %}
+
+{% macro small_inline(content) -%}
+<small>{{ content }}</small>
+{%- endmacro %}
+
+{% macro muted_inline(content) -%}
+<span class="text-muted">{{ content }}</span>
+{%- endmacro %}
+
+{% macro mark_inline(content) -%}
+<mark>{{ content }}</mark>
+{%- endmacro %}
+
+{% macro wrap_in_paren(content) -%}
+({{ content }})
+{%- endmacro %}
+
+{% macro parameter_label(parameter, label) %}
+<label for="param-input-{{ parameter }}" class="mb-1">
+    <small class="text-muted">{{ label if label is not none else parameter }}</small>
+</label>
+{% endmacro %}
+
+{% macro input(type, parameter, label=none) %}
+<div>
+{{ parameter_label(parameter, label) }}
+<input id="param-input-{{ parameter }}" type="{{ type }}" class="form-control pages-parameter" data-parameter="{{ parameter }}">
+</div>
+{% endmacro %}
+
+{% macro input_date(parameter, label=none) %}
+{{ input("date", parameter, label)}}
+{% endmacro %}
+
+{% macro input_month(parameter, label=none) %}
+{{ input("month", parameter, label)}}
+{% endmacro %}
+
+{% macro input_datetime(parameter, label=none) %}
+{{ input("datetime-local", parameter, label) }}
+{% endmacro %}
+
+{% macro input_time(parameter, label=none) %}
+{{ input("time", parameter, label) }}
+{% endmacro %}
+
+{% macro input_select(parameter, options, label=none, multiple=False) %}
+<div>
+{{ parameter_label(parameter, label) }}
+<select id="param-input-{{ parameter }}" {{ "multiple" if multiple }} class="form-select pages-parameter" data-parameter="{{ parameter }}">
+{% for option in options %}
+<option value="{{ option }}">{{ option }}</option>
+{% endfor %}
+</select>
+</div>
+{% endmacro %}

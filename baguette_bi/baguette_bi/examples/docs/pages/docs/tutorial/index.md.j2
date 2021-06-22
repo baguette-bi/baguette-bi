@@ -1,0 +1,33 @@
+{% include "header.md.j2" %}
+
+# {{ icon }} Bagutte BI tutorial
+
+## Contents
+
+- {{ "👩‍💻 Get the data" | link("docs/tutorial/get_the_data") | big }}
+- {{ "👩‍🎨 Format the page" | link("docs/tutorial/format_the_page") | big }}
+- {{ "📊 Add a chart" | link("docs/tutorial/add_a_chart") | big }}
+- {{ "🐙 Make parametrized charts" | link("docs/tutorial/make_parametrized_charts") | big }}
+- {{ "🗺 Create navigation" | link("docs/tutorial/create_navigation") | big }}
+- {{ "🃏 Use parameters in a dataset" | link("docs/tutorial/use_parameters_in_a_dataset") | big }}
+- {{ "🤨 Something" | link("docs/tutorial/something") | big }}
+
+## Install Baguette BI and set up a project
+
+To install Baguette BI, run:
+
+```sh
+pip install baguette-bi
+```
+
+Then create a new project by running:
+
+```sh
+baguette new tutorial
+```
+
+To start the development server, run:
+
+```sh
+baguette server --reload ./tutorial
+```

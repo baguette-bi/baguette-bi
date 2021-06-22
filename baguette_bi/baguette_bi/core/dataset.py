@@ -1,54 +1,44 @@
-import json
-from hashlib import md5
-from typing import Protocol
+from typing import Any, Dict, Protocol
 
 import pandas as pd
+import pydantic
 
-from .context import RenderContext
-from .data_request import DataRequest
-from .secret import SecretDict
+from baguette_bi.core.data_request import DataRequest
 
 
 class Connectable(Protocol):
     type: str
-    params: SecretDict
-
-    def store(self, identifier: str, df: pd.DataFrame):
-        """Store a dataframe"""
-
-    def retrieve(self, identifier: str):
-        """Store a dataframe"""
+    details: Dict
 
     def execute(self, data_request: DataRequest) -> pd.DataFrame:
-        """Execute a query against this connection"""
-
-    def unstore(self, identifier: str):
-        """Delete stored data."""
+        ...
 
 
-class Dataset:
-    def __init__(
-        self,
-        name: str,
-        query: str,
-        connection: Connectable,
-        storage_connection: Connectable = None,
-        refresh_interval: int = None,
-    ):
-        self.id = md5(
-            json.dumps({"query": query, "connection": connection.dict()}).encode(
-                "UTF-8"
-            )
-        ).hexdigest()
-        self.name = name
-        self.query = query
-        self.connection = connection
-        self.storage_connection = storage_connection
-        self.refresh_interval = refresh_interval
+class DatasetMeta(type):
+    def __init__(cls, name, bases, attrs):
+        cls.__parameters_model__ = pydantic.dataclasses.dataclass(
+            cls.Parameters
+        ).__pydantic_model__
+        cls.id = f"{cls.__module__}.{name}"
+        super().__init__(name, bases, attrs)
 
-    def get_data(self, render_context: RenderContext):
-        request = DataRequest(query=self.query)
-        return self.connection.execute(request)
-
-    def __hash__(self) -> int:
+    def __hash__(self):
         return hash(id(self))
+
+
+class Dataset(metaclass=DatasetMeta):
+
+    connection: Connectable
+    query: Any = None
+
+    class Parameters:
+        pass
+
+    def get_data(self, render_context) -> pd.DataFrame:
+        parameters = self.__parameters_model__.parse_obj(render_context.parameters)
+        request = DataRequest(query=self.query, parameters=parameters.dict())
+        df = self.connection.execute(request)
+        return self.transform(df)
+
+    def transform(self, df: pd.DataFrame) -> pd.DataFrame:
+        return df

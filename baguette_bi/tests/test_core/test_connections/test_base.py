@@ -1,14 +1,13 @@
 from unittest.mock import MagicMock
 
 import pytest
+
 from baguette_bi.core.connections.base import (
     Connection,
     ConnectionMeta,
     execute_wrapper,
 )
 from baguette_bi.core.data_request import DataRequest
-from baguette_bi.core.dataset import Dataset
-from baguette_bi.core.secret import SecretDict
 
 
 def test_execute_wrapper():
@@ -32,11 +31,6 @@ def test_connection_meta():
     assert mockconn.transform_request.call_count == 1
 
 
-def test_connection_details_secret_dict():
-    conn = Connection()
-    assert isinstance(conn.details, SecretDict)
-
-
 def test_connection_dict():
     conn = Connection()
     assert conn.dict() == {"type": None, "details": {}}
@@ -57,8 +51,3 @@ def test_execute_raises_not_implemented():
     mockreq.parameters = {}
     with pytest.raises(NotImplementedError):
         conn.execute(mockreq)
-
-
-def test_dataset():
-    conn = Connection()
-    assert isinstance(conn.dataset("test", "test"), Dataset)

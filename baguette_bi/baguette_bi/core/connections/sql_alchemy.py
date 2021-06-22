@@ -1,10 +1,10 @@
+import numpy as np
 import pandas as pd
 from sqlalchemy.engine import create_engine
 from sqlalchemy.engine.url import URL
 
+from baguette_bi.core.connections.base import Connection
 from baguette_bi.core.data_request import DataRequest
-
-from .base import Connection
 
 
 class SQLAlchemyConnection(Connection):
@@ -37,4 +37,4 @@ class SQLAlchemyConnection(Connection):
         return self._engine
 
     def execute(self, req: DataRequest) -> pd.DataFrame:
-        return pd.read_sql(req.query, self.engine)
+        return pd.read_sql(req.query, self.engine, params=req.parameters).fillna(np.nan)

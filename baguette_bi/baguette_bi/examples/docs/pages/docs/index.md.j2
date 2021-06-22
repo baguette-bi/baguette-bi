@@ -1,0 +1,37 @@
+{% include "header.md.j2" %}
+
+# Baguette BI documentation
+
+Baguette BI is a Python Business Intelligence framework. It allows data teams to define
+their main deliverable with Python and Markdown, thus making it version-controlled,
+easily reviewable, testable and reproducible.
+
+To dive straight in, read the {{ "Tutorial" | link("docs/tutorial/index") }}.
+
+For a set of problems that this framework tries to solve and what it does differently
+than other BI tools, see {{ "Motivation" | link("motivation") }}.
+
+For a non-exhaustive list of what can be done in Baguette, consult with
+{{ "Reference" | link("docs/reference") }}.
+
+
+## Install and run it yourself
+
+To run the docs on your local machine, first install Baguette with `pip`:
+
+`$ pip install baguette_bi`
+
+And then run the docs command:
+
+`$ baguette docs`
+
+
+## Acknowledgements
+
+Baguette BI wouldn't exist without Artemiy [@s1yrat](https://github.com/s1yrat) and his
+insightful feedback, ideas and, of course, code contributions.
+
+The credit for the original idea that BI should look like a set of hyperlinked pages,
+not dashboards, goes to Adam [@mcrascal](https://github.com/mcrascal). Check out his project,
+[Evidence](https://www.evidence.dev/), which is similar, but also different, and has much
+better design 😅.

@@ -1,0 +1,11 @@
+{% set datasets = DataFrame("docs.datasets.VegaDatasetsList") %}
+
+# Vega datasets explorer
+
+{{ datasets.shape[0] | big_number("Total number of datasets") }}
+
+{% call grid() %}
+{% for dataset in datasets["dataset"] %}
+{{ '✨ {}'.format(dataset) | link("docs/tutorial/examples/final/summary", dataset_name=dataset) }}
+{% endfor %}
+{% endcall %}

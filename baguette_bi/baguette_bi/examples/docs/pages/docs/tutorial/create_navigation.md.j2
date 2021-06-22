@@ -1,0 +1,237 @@
+{% include "docs/styles.j2" %}
+{% set datasets = DataFrame("docs.datasets.VegaDatasetsList") %}
+
+{% macro nav() %}
+{% call row() %}
+{{ "👈 Make parametrized charts" | link("docs/tutorial/make_parametrized_charts") }}
+{{ "☝️ Tutorial index" | link("docs/tutorial/index") }}
+{{ "Create a dataset template 👉" | link("docs/tutorial/use_parameters_in_a_dataset") }}
+{% endcall %}
+{% endmacro %}
+
+{{ nav() }}
+
+
+# 🗺 Create navigation
+
+We've learned how to generate multiple charts from a template, taking advantage of
+parameters. What if we wanted to generalize this even more and have Baguette
+automatically make a summary for each Vega dataset?
+
+We can do that, but first, let's talk about how users would navigate such a project.
+
+## Make a link
+
+Right now, you project looks like this:
+
+``` { .text hl_lines="7 8" }
+tutorial
+├── __init__.py
+├── charts
+│   └── __init__.py
+├── connections.py
+├── datasets.py
+└── pages
+    └── index.md.j2
+```
+
+Generally, your index page is not a good place to place any reports. This is the first
+page that your users will see, so it makes sense to put some links to other pages in
+your project here.
+
+Let's rename `index.md.j2` to `cars.md.j2` and create an empty `index.md.j2` file:
+
+``` { .text hl_lines="7 8 9" }
+tutorial
+├── __init__.py
+├── charts
+│   └── __init__.py
+├── connections.py
+├── datasets.py
+└── pages
+    └── index.md.j2
+    └── cars.md.j2  👈 this is your old index page
+```
+
+If someone goes to the front page, we want them to access the `Cars` summary that we
+previously made.
+
+For that, you can use a `link` filter:
+
+```jinja
+{% raw %}
+{{ "😎 Link text" | link("path/to/page") }}
+{% endraw %}
+```
+
+So, let's make a link for cars! And we'll add a header too:
+
+```jinja
+{% raw %}
+# Vega datasets exporer
+
+{{ "🚘 Cars dataset summary" | link("cars") }}
+{% endraw %}
+```
+
+<iframe class="embed" src="/pages/docs/tutorial/examples/create_navigation_1?_embed=" style="height: 15em;"></iframe>
+
+## A list of all datasets
+
+We might also want to add some summary information to the front page, like the total
+number of datasets. Let's do that.
+
+First, we need to get a list of all datasets. Let's make a dataset of that!
+
+```python
+from baguette_bi import bi
+import pandas as pd
+from vega_datasets import data
+
+
+class VegaDatasetsList(bi.Dataset):
+    def get_data(self, render_context):
+        return pd.DataFrame(data={"dataset": data.list_datasets()})
+```
+
+Most of you datasets will query some connection. But you can also make a "custom"
+dataset by overriding the `get_data` method and just returning any Pandas DataFrame.
+
+A `data` object from `vega_datasets` package has a `list_datasets` method that will
+conveniently return a list of all dataset names. We'll just put that into a DataFrame
+and return it.
+
+## Big numbers
+
+Some numbers are important, others are even more. In such cases, we want them to really
+stand out, and maybe add a title and a subtitle.
+
+For that, we can use `big_number` filter:
+
+```jinja
+{% raw %}
+{{ 42 | big_number("The answer", subtitle="to the question of everything") }}
+{% endraw %}
+```
+
+{% call row() %}
+{{ 42 | big_number("The answer", subtitle="to the question of everything") }}
+{% endcall %}
+
+A big number, surprisingly, doesn't have to be a number, it's just what we name this
+kind of display.
+
+```jinja
+{% raw %}
+{{ "Forty two" | big_number("The answer", subtitle="to the question of everything") }}
+{% endraw %}
+```
+
+{% call row() %}
+{{ "Forty two" | big_number("The answer", subtitle="to the question of everything") }}
+{% endcall %}
+
+To put several big numbers in a row, call a `row` macro. This macro isn't called like a
+function, it's called with a `call` directive instead. This allows us to "wrap" any
+elements with the macro:
+
+```jinja
+{% raw %}
+{% call row() %}
+{{ 42 | big_number("The answer", subtitle="to the question of everything") }}
+{{ "Forty two" | big_number("Text version") }}
+{% endcall %}
+{% endraw %}
+```
+
+{% call row() %}
+{{ 42 | big_number("The answer", subtitle="to the question of everything") }}
+{{ "Forty two" | big_number("Text version") }}
+{% endcall %}
+
+Now we can add our "dataset of datasets" to the page and count them:
+
+```jinja
+{% raw %}
+{% set datasets = DataFrame("tutorial.datasets.VegaDatasetsList") %}
+
+# Vega datasets explorer
+
+{{ datasets.shape[0] | big_number("Total number of datasets") }}
+
+{{ "🚘 Cars summary" | link("cars") }}
+{% endraw %}
+```
+
+<iframe class="embed" src="/pages/docs/tutorial/examples/create_navigation_2?_embed=" style="height: 20em;"></iframe>
+
+## Generate links to the future summaries
+
+Let's create a new file `summary.md.j2`, which in the future will display a chosen
+dataset's summary.
+
+Next, as you might have guessed, we'll generate 70 links to all the datasets. 70 lines
+will require a lot of scrolling, so we'll put them in a row. We'll also add a `•` symbol
+before each link for visual separation
+
+```jinja2
+{% raw %}
+{% call row() %}
+{% for dataset in datasets["dataset"] %}
+{{ ' • {}'.format(dataset) | link("summary", dataset_name=dataset) }}
+{% endfor %}
+{% endcall %}
+{% endraw %}
+```
+
+{% call row() %}
+{% for dataset in datasets["dataset"] %}
+{{ ' • {}'.format(dataset) | link("summary", dataset_name=dataset) }}
+{% endfor %}
+{% endcall %}
+
+Yes, links know about parameters too. You can pass them as keyword arguments, and they
+will be added as URL query params.
+
+Another, likely more readable way to arrange the links (or any content) is using a grid:
+
+```jinja
+{% raw %}
+{% call grid() %}
+{% for dataset in datasets["dataset"] %}
+{{ '✨ {}'.format(dataset) | link("summary", dataset_name=dataset) }}
+{% endfor %}
+{% endcall %}
+{% endraw %}
+```
+
+By default, there will be 3 columns, but you can specify any number as an argument, e.g.
+`{{ '{%' }} call grid(6) {{ '%}' }}`.
+
+{% call grid() %}
+{% for dataset in datasets["dataset"] %}
+{{ '✨ {}'.format(dataset) | link("summary", dataset_name=dataset) }}
+{% endfor %}
+{% endcall %}
+
+Now, let's look at our final index page:
+
+```jinja
+{% raw %}
+{% set datasets = DataFrame("tutorial.datasets.VegaDatasetsList") %}
+
+# Vega datasets explorer
+
+{{ datasets.shape[0] | big_number("Total number of datasets") }}
+
+{% call grid() %}
+{% for dataset in datasets["dataset"] %}
+{{ '✨ {}'.format(dataset) | link("summary", dataset_name=dataset) }}
+{% endfor %}
+{% endcall %}
+{% endraw %}
+```
+
+<iframe class="embed" src="/pages/docs/tutorial/examples/create_navigation_3?_embed=" style="height: 30em;"></iframe>
+
+{{ nav() }}

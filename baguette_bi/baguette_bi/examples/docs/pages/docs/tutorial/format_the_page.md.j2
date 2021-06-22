@@ -1,0 +1,95 @@
+{% include "docs/styles.j2" %}
+
+{% macro nav() %}
+{% call row() %}
+{{ "👈 Get the data" | link("docs/tutorial/get_the_data") }}
+{{ "☝️ Tutorial index" | link("docs/tutorial/index") }}
+{{ "Add a chart 👉" | link("docs/tutorial/add_a_chart") }}
+{% endcall %}
+{% endmacro %}
+
+{% set cars = DataFrame("docs.datasets.Cars") %}
+
+{{ nav() }}
+
+# 👩‍🎨 Format the page
+
+Right now, our page works, but it's not much. We'd like to call the readers' attention
+to some important values, make them stand out.
+
+## Make some values stand out
+
+Number of columns and rows do not stand out very much and are "lost" in the surrounding
+text. To change that, you can use Markdown text formatting and several additional
+options included in Baguette BI.
+
+To make any text __bold__, surround it would double underscores, like this:
+
+```md
+surrounding text __bold text__ surrounding text
+```
+
+If you want to do this with a value calculated from a DataFrame, like number of rows in
+our example, you have to write this:
+
+```jinja
+{% raw %}
+... contains __{{ cars.shape[1] }}__ columns ...
+{% endraw %}
+```
+
+This isn't very nice, so there's another option: using a `strong` filter:
+
+```jinja
+{% raw %}
+... contains {{ cars.shape[1] | strong }} columns ...
+{% endraw %}
+```
+
+which looks the same in the end:
+
+... contains {{ cars.shape[1] | strong }} columns ...
+
+BUT the filters are more flexible, because you can chain them. For example, to also make
+the number big, you can write this:
+
+```jinja
+{% raw %}
+... contains {{ cars.shape[1] | strong | big }} columns ...
+{% endraw %}
+```
+
+... contains {{ cars.shape[1] | big | strong }} columns ...
+
+There are many text decoration filters in Baguette BI:
+
+- `strong` to make the text {{ "bold" | strong }}
+- `em` for {{ "emplasis" | em }}
+- `underline` for {{ "inderlined text" | underline }}
+- `strike` for {{ "strikethough text" | strike }}
+- `big` for {{ "enlarged text" | big }}
+- `small` for {{ "making the text smaller" | small }}
+- `mark` for {{ "marked text" | mark }}
+- `muted` for making the text {{ "muted" | muted }}
+- `paren` for {{ "wrapping the text in parentheses" | paren }}
+
+In the end, you page should look something like this:
+
+```jinja
+{% raw %}
+{% set cars = DataFrame("docs.datasets.Cars") %}
+
+# Vega dataset: __Cars__
+
+The dataset contains {{ cars.shape[1] | big | strong }} columns and
+{{ cars.shape[0] | big | strong }} rows.
+
+## Dataset summary
+
+{{ cars.describe() | table(max_rows=None) }}
+{% endraw %}
+```
+
+<iframe class="embed" src="/pages/docs/tutorial/examples/format_the_page_1?_embed=" style="height: 30em;"></iframe>
+
+{{ nav() }}

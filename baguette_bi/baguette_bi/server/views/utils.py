@@ -1,28 +1,54 @@
-from pathlib import Path
+import json
 from typing import Dict, Optional
 
 from fastapi import Depends, Request
-from fastapi.templating import Jinja2Templates
+from fastapi.responses import HTMLResponse
 
-from baguette_bi.server import models, security, settings, templates
-
-templates_dir = Path(templates.__file__).parent.resolve()
-j2 = Jinja2Templates(directory=str(templates_dir))
+from baguette_bi.server import models, security, settings, static, templating
+from baguette_bi.server.project import Project, get_project
 
 
-def templates(
-    request: Request, user: Optional[models.User] = Depends(security.maybe_user)
-):
-    def render_template(name: str, context: Dict = None):
-        # TODO: flashes
-        ctx = {
-            "request": request,
-            "user": user,
-            "icon": settings.icon,
-            "title": settings.title,
-        }
-        if context:
-            ctx.update(context)
-        return j2.TemplateResponse(name, ctx)
+def template_context(
+    request: Request,
+    user: Optional[models.User] = Depends(security.maybe_user),
+    project: Project = Depends(get_project),
+) -> Dict:
+    return {
+        "request": request,
+        "user": user,
+        "icon": settings.icon,
+        "title": settings.title,
+        "url_for": request.url_for,
+        "project": project,
+    }
 
-    return render_template
+
+def templates(ctx: Dict = Depends(template_context)):
+    def render(name: str, **context) -> HTMLResponse:
+        ctx.update(context)
+        return HTMLResponse(templating.inner.get_template(name).render(ctx))
+
+    return render
+
+
+fallback_locale = "en-US.json"
+
+
+def get_format_locale(filename: str, folder: str = "format"):
+    basepath = static.path / "locales" / folder
+    if not (path := basepath / filename).is_file():
+        path = basepath / fallback_locale
+    return json.loads(path.read_text())
+
+
+def get_time_format_locale(filename: str):
+    return get_format_locale(filename, folder="time-format")
+
+
+def get_locale_definition():
+    basename = settings.locale.split(".")[0].replace("_", "-")
+    filename = f"{basename}.json"
+    return {
+        "formatLocale": get_format_locale(filename),
+        "timeFormatLocale": get_time_format_locale(filename),
+    }

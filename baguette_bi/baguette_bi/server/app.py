@@ -1,18 +1,12 @@
-from pathlib import Path
-
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, status
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 
-from baguette_bi.server import api, settings, startup, static, views
-from baguette_bi.server.exc import WebException
+from baguette_bi.server import api, exc, settings, static, views
 
-static_dir = Path(static.__file__).parent.resolve()
-
-app = FastAPI()
-app.on_event("startup")(startup.run)
-app.mount("/static", StaticFiles(directory=static_dir), name="static")
+app = FastAPI(debug=settings.debug)
+app.mount("/static", StaticFiles(directory=static.path), name="static")
 
 app.add_middleware(
     SessionMiddleware,
@@ -21,10 +15,12 @@ app.add_middleware(
     max_age=settings.session_max_age,
 )
 
-app.include_router(api.router, prefix="/api")
 app.include_router(views.router)
+app.include_router(api.router, prefix="/api")
 
 
-@app.exception_handler(WebException)
-def handle_web_exception(request: Request, exc: WebException):
-    return RedirectResponse(request.url_for("get_login"))
+@app.exception_handler(exc.WebException)
+def handle_web_exception(request: Request, exc: exc.WebException):
+    if exc.status_code == status.HTTP_401_UNAUTHORIZED:
+        return RedirectResponse(request.url_for("get_login"), 307)
+    return RedirectResponse(request.url_for("index"), 308)

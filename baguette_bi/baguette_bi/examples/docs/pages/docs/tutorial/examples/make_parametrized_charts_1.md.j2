@@ -1,0 +1,18 @@
+{% set cars = DataFrame("docs.datasets.Cars") %}
+
+# Vega dataset: __Cars__
+
+The dataset contains {{ cars.shape[1] | big | strong }} columns and
+{{ cars.shape[0] | big | strong }} rows.
+
+## Dataset summary
+
+{{ cars.describe() | table(max_rows=None) }}
+
+## Columns
+{% for column in cars.columns %}
+{% if (cars[column].dtype | string) in ("int64", "float64") %}
+### {{ column }}
+{{ chart("docs.charts.tutorial.CarsColumnHistogram", column=column) }}
+{% endif %}
+{% endfor %}
