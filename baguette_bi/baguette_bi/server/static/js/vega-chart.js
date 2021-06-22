@@ -28,7 +28,7 @@ async function mountChart(id, el) {
         console.log(res.traceback);
         alert("Error loading chart, please contact server administrator.");
     } else {
-        await vegaEmbed(el, res, { actions: false });
+        await vegaEmbed(el, res, { actions: false, ...vegaLocale });
     }
 }
 

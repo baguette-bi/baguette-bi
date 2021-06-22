@@ -20,7 +20,7 @@ class ConnectionMeta(type):
 
 
 class Connection(metaclass=ConnectionMeta):
-    type: str = None
+    type: str
 
     def __init__(self, **details):
         self.details = details

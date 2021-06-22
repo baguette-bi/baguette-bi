@@ -9,7 +9,10 @@
 {% endmacro %}
 
 {% macro chart(name) %}
-<div class="pages-chart" data-chart="{{ name }}" data-parameters="{{ kwargs | tojson | forceescape }}">
+<div class="pages-chart"
+     data-chart="{{ name }}"
+     data-parameters="{{ kwargs | tojson | forceescape }}">
+<img class="d-block mx-auto" height="10" src="/static/loader.gif">
 </div>
 {% endmacro %}
 

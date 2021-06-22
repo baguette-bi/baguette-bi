@@ -1,5 +1,4 @@
 import inspect
-import json
 from pathlib import Path
 from typing import Dict
 from urllib.parse import urlencode, urljoin
@@ -10,17 +9,10 @@ from jinja2.runtime import Macro
 
 from baguette_bi.server import project, settings, templates
 
-inner = Environment(loader=FileSystemLoader(Path(templates.__file__).parent.resolve()))
+inner = Environment(loader=FileSystemLoader(templates.path))
 pages = Environment(
     loader=FileSystemLoader(Path(settings.project).resolve() / settings.pages_dir)
 )
-
-
-def to_json(val):
-    return json.dumps(val)
-
-
-inner.filters["to_json"] = to_json
 
 
 def DataFrame(path: str):

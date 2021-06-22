@@ -9,13 +9,19 @@ from markdown import Markdown
 from baguette_bi.core import RenderContext
 from baguette_bi.server import exc, models, security, settings
 from baguette_bi.server.project import Project, get_project
-from baguette_bi.server.views.utils import template_context, templates
+from baguette_bi.server.views.utils import (
+    get_locale_definition,
+    template_context,
+    templates,
+)
 
 router = APIRouter()
 
 md = Markdown(extensions=["fenced_code", "codehilite", "toc"])
 
 router = APIRouter()
+
+locale = get_locale_definition()
 
 
 @router.get("/", dependencies=[Depends(security.authenticated)])
@@ -55,7 +61,7 @@ def get_page(
         }
     )
     page = md.convert(template.render(context))
-    return render("pages.html.j2", page=page, _embed=_embed)
+    return render("pages.html.j2", page=page, _embed=_embed, locale=locale)
 
 
 @router.get("/login/")

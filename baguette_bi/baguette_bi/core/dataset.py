@@ -8,10 +8,10 @@ from baguette_bi.core.data_request import DataRequest
 
 class Connectable(Protocol):
     type: str
-    params: Dict
+    details: Dict
 
     def execute(self, data_request: DataRequest) -> pd.DataFrame:
-        """Execute a query against this connection"""
+        ...
 
 
 class DatasetMeta(type):
@@ -28,7 +28,7 @@ class DatasetMeta(type):
 
 class Dataset(metaclass=DatasetMeta):
 
-    connection: Connectable = None
+    connection: Connectable
     query: Any = None
 
     class Parameters:
