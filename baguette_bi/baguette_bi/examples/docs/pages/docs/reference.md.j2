@@ -116,6 +116,7 @@ calculated values.
 - {{ '{{' }} 'em' | em {{ '}}' }}
 - {{ '{{' }} 'big' | big {{ '}}' }}
 - {{ '{{' }} 'small' | small {{ '}}' }}
+- {{ '{{' }} 'muted' | muted {{ '}}' }}
 ```
 
 Outputs this:
@@ -124,14 +125,7 @@ Outputs this:
 - {{ 'text' | em }}
 - {{ 'text' | big }}
 - {{ 'text' | small }}
-
-### Small and muted
-
-```plaintext
-{{ '{{' }} 'Small and muted' | small_muted {{ '}}' }}
-```
-
-{{ 'Small and muted' | small_muted }}
+- {{ 'text' | muted }}
 
 ### Wrapping text in parentheses
 
@@ -159,7 +153,7 @@ Helper filters (and others) can be combined in an arbitrary way:
 #### {{ '{{' }} 'This header isn\'t supposed to be in TOC' {{ '}}' }} {{ '{{' }} 'it\'s and example' | paren | small_muted {{ '}}' }}
 ```
 
-#### {{ 'This header isn\'t supposed to be in TOC'  }} {{ 'it\'s an example' | paren | small_muted }}
+#### {{ 'This header isn\'t supposed to be in TOC'  }} {{ 'it\'s an example' | paren | muted | small }}
 
 
 ## Locale-aware formatting numbers and time

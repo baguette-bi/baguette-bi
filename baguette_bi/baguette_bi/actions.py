@@ -45,7 +45,10 @@ def run_migrations():
 
 
 def create_default_admin():
-    users_create("admin", settings.default_admin_password, is_admin=True)
+    try:
+        users_create("admin", settings.default_admin_password, is_admin=True)
+    except Conflict:
+        print("Default admin user already exists, skipping")
 
 
 def generate_password(n: int = 12):
@@ -68,11 +71,12 @@ def develop(
     project: Path,
     host: str = "127.0.0.1",
     port: int = 8000,
+    reload: bool = True,
 ):
     os.environ["BAGUETTE_PROJECT"] = str(project)
     uvicorn.run(
         "baguette_bi.server.app:app",
-        reload=True,
+        reload=reload,
         reload_dirs=[str(project)],
         host=host,
         port=port,
@@ -96,7 +100,7 @@ def docs_run(
         )
         t.start()
 
-    server_run(project=project, reload=reload, host=host, port=port)
+    develop(project=project, host=host, port=port, reload=reload)
 
 
 def db_init():

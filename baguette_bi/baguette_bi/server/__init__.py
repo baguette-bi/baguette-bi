@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Optional
 
 from pydantic import BaseSettings
 
@@ -20,6 +21,11 @@ class Settings(BaseSettings):
     secret_key: str = "secret"
     database_url: str = "sqlite:///baguette.db"
     default_admin_password: str = "baguette"
+
+    redis_host: Optional[str] = None  # Disabled by default
+    redis_port: Optional[int] = 6379
+    redis_db: Optional[int] = 0
+    dataset_cache_ttl: int = 60 * 20  # 20 minutes
 
     icon: str = "🥖"
     title: str = "Baguette BI"
