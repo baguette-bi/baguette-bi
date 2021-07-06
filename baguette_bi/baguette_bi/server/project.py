@@ -4,12 +4,15 @@ import pkgutil
 import sys
 from contextlib import contextmanager
 from dataclasses import dataclass
+from functools import cache
 from pathlib import Path
 from typing import Dict
 
-from baguette_bi.core.chart import AltairChart, Chart, ChartMeta
-from baguette_bi.core.folder import Folder
-from baguette_bi.settings import settings
+from baguette_bi.core import AltairChart, Dataset
+from baguette_bi.core.chart import Chart
+from baguette_bi.exc import NotFound
+from baguette_bi.server import settings
+from baguette_bi.server.templating import Environment, pages
 
 
 @contextmanager
@@ -50,31 +53,39 @@ def is_chart(obj):
     )
 
 
-def is_folder(obj):
-    return isinstance(obj, Folder)
+def is_dataset(obj):
+    return inspect.isclass(obj) and issubclass(obj, Dataset) and obj is not Dataset
 
 
 @dataclass
 class Project:
-    root: Folder
-    folders: Dict[str, Folder]
-    charts: Dict[str, ChartMeta]
+    datasets: Dict[str, Dataset]
+    charts: Dict[str, Chart]
+    pages: Environment
 
     @classmethod
+    @cache  # import only once
     def import_path(cls, path: Path) -> "Project":
-        root = Folder("__root__")
-        folders = {}
         charts = {}
+        datasets = {}
         for module in _import_path(path):
-            for _, folder in inspect.getmembers(module, is_folder):
-                folders[folder.id] = folder
-                if folder.parent is None and folder not in root.children:
-                    root.children.append(folder)
             for _, chart in inspect.getmembers(module, is_chart):
                 charts[chart.id] = chart
-                if chart.folder is None and chart not in root.charts:
-                    root.charts.append(chart)
-        return cls(root=root, folders=folders, charts=charts)
+            for _, dataset in inspect.getmembers(module, is_dataset):
+                datasets[dataset.id] = dataset
+        return cls(
+            charts=charts,
+            pages=pages,
+            datasets=datasets,
+        )
+
+    def get_chart(self, pk: str):
+        chart = self.charts.get(pk)
+        if chart is None:
+            raise NotFound
+        return chart
 
 
-project = Project.import_path(settings.project)
+@cache
+def get_project():
+    return Project.import_path(settings.project)

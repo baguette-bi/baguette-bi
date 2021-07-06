@@ -1,0 +1,41 @@
+{% extends "base.html.j2" %}
+
+{% block title %}
+    <title>{{ title }}</title>
+{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', path='css/codehilite/solarized.css') }}">
+{% include "elements/vega-imports.html.j2" %}
+<script src="{{ url_for('static', path='js/vega-chart.js') }}"></script>
+{% endblock head %}
+
+{% block content %}
+<div class="pages-page col-sm-12 col-md-10 col-lg-8 col-xl-6 mx-auto">
+{{ page | safe }}
+</div>
+{% if not _embed %}
+<footer style="height: 100px"></div>
+{% endif %}
+{% endblock content %}
+
+{% block bottom %}
+<script>
+const urlParams = getURLParams();
+
+// update parameter input values and set event listeners
+document.querySelectorAll(".pages-parameter").forEach(el => {
+    const param = el.dataset.parameter;
+    if (typeof urlParams[param] !== "undefined") {
+        el.value = urlParams[param];
+    }
+    el.addEventListener("change", e => {
+        const params = Object.assign({}, urlParams);
+        params[param] = e.target.value;
+        window.location.search = new URLSearchParams(params);
+    });
+});
+
+mountAllCharts();
+</script>
+{% endblock bottom %}

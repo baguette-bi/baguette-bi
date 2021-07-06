@@ -1,0 +1,15 @@
+<nav class="d-print-none d-flex flex-md-column flex-row align-items-start sidebar">
+    <a href="{{ url_for('index') }}" class="d-flex sidebar-button sidebar-logo">
+        <svg class="m-auto" width="25" height="25">
+            <text x="0", y="15" font-size="24" alignment-baseline="middle">{{ icon }}</text>
+        </svg>
+    </a>
+
+    <ul class="d-flex flex-column mb-auto sidebar-button-group">
+    {% if user is not none %}
+        <li class="sidebar-button d-flex">
+            <a class="m-auto" href="{{ url_for('get_logout') }}"><i class="bi bi-door-open"></i></a>
+        </li>
+    {% endif %}
+    </ul>
+</nav>

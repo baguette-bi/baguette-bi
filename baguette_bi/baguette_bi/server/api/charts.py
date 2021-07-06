@@ -1,23 +1,35 @@
-from baguette_bi.core.chart import Chart
-from baguette_bi.server import schema
-from baguette_bi.server.project import project
-from fastapi import APIRouter, HTTPException, status
+import traceback
+from contextlib import contextmanager
+
+from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import JSONResponse
+
+from baguette_bi.core.context import RenderContext
+from baguette_bi.exc import NotFound
+from baguette_bi.server import schema, security
+from baguette_bi.server.project import Project, get_project
 
 router = APIRouter()
 
 
-@router.get("/{pk}/", response_model=schema.ChartRead)
-def read_chart(pk: str):
-    chart = project.charts.get(pk)
-    if chart is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND)
-    return schema.ChartRead.from_orm(chart)
+@contextmanager
+def handle_project_exceptions():
+    try:
+        yield
+    except NotFound:
+        raise HTTPException(404)
 
 
-@router.post("/{pk}/render/")
-def render_chart(pk: str, render_context: schema.RenderContext):
-    chart_cls = project.charts.get(pk)
-    if chart_cls is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND)
-    chart: Chart = chart_cls()
-    return chart.get_definition(render_context)
+@router.post("/{pk}/render/", dependencies=[Depends(security.authenticated_api)])
+def render_chart(
+    pk: str,
+    render_context: schema.RenderContext,
+    project: Project = Depends(get_project),
+):
+    with handle_project_exceptions():
+        chart = project.get_chart(pk)()
+        try:
+            return chart.get_definition(RenderContext(**render_context.dict()))
+        except Exception:
+            tb = traceback.format_exc()
+            return JSONResponse({"traceback": tb}, status_code=400)

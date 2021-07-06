@@ -1,37 +1,44 @@
+{% macro something() %}
+<p>Something!</p>
+{% endmacro %}
+
 <!doctype html>
 <html>
-
     <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
         {% block title %}
-            <title>Baguette BI</title>
+            <title>{{ title }}</title>
         {% endblock %}
 
-        {% block head %}
-
-        {% endblock %}
-
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥖</text></svg>">
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>{{ icon }}</text></svg>">
         <link rel="stylesheet" href="{{ url_for('static', path='css/bootstrap.min.css') }}">
         <link rel="stylesheet" href="{{ url_for('static', path='css/bootstrap-icons.css') }}">
+
+        {% block head %}{% endblock %}
+
         <link rel="stylesheet" href="{{ url_for('static', path='css/base.css') }}">
+        {% include "elements/vega-imports.html.j2" %}
+        <script src="{{ url_for('static', path='js/vega-chart.js') }}"></script>
     </head>
 
     <body>
+    <div class="d-flex flex-md-row flex-column">
+        {% if not _embed %}
+        {% include "elements/sidebar.html.j2" %}
+        {% endif %}
 
-        {# {% include "elements/nav.html.j2" %} #}
-
-
-        <main>
-            <div class="container">
-                {% include "elements/flashes.html.j2" %}
+        <main class="main-container flex-fill">
+            <div class="container-fluid">
                 {% block content %}{% endblock %}
             </div>
         </main>
 
-        <hr>
+    </div>
+
 
         <script src="{{ url_for('static', path='js/bootstrap.bundle.min.js') }}"></script>
-
+        {% block bottom %}{% endblock %}
     </body>
 
 </html>

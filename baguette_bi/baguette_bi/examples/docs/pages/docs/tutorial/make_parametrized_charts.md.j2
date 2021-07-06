@@ -1,0 +1,135 @@
+{% include "docs/styles.j2" %}
+
+{% macro nav() %}
+{% call row() %}
+{{ "👈 Add a chart" | link("docs/tutorial/add_a_chart") }}
+{{ "☝️ Tutorial index" | link("docs/tutorial/index") }}
+{{ "Create navigation 👉" | link("docs/tutorial/create_navigation") }}
+{% endcall %}
+{% endmacro %}
+
+{{ nav() }}
+
+# 🐙 Make parametrized charts
+
+We added a histogram for a single column. But what if we wanted to add a histogram
+for each and every column in our dataset? Surely, we're too lazy to type them all out,
+and for good reason!
+
+_What if_ there was a way to tell our chart which column to make a histogram of? Not too
+accidentally, there is! And it's called __parameters__.
+
+Both charts and datasets in Baguette BI can be parametrized. We'll concentrate on charts
+for now and talk about datasets later.
+
+
+## Request a parameter in a chart
+
+Let's make a new chart. It will request a dataset and a column name. It will return a
+histogram of that column.
+
+```python
+class CarsColumnHistogram(bi.AltairChart):
+    def render(self, column: str, cars: pd.DataFrame = Cars):
+        return (
+            alt.Chart(cars)
+            .mark_bar()
+            .encode(x=alt.X(f"{column}:Q", bin=True), y="count()")
+        )
+```
+
+There's no default value here for the `column` parameter, so it is __required__. It means
+that Baguette will raise an error if there's no `column` parameter in the _context_. A
+context is just a set of parameters that a particular page was requested with, we'll
+encounter it more later.
+
+You can also make a parameter __optional__ by passing a default value:
+
+```python
+class CarsColumnHistogram(bi.AltairChart):
+    def render(self, column: str = "Horsepower", cars: pd.DataFrame = Cars):
+        return (
+            alt.Chart(cars)
+            .mark_bar()
+            .encode(x=alt.X(f"{column}:Q", bin=True), y="count()")
+        )
+```
+
+This way, if there's no parameter `column` specified for a chart, it will default to
+`Horsepower`.
+
+How do you display such a parametrized chart? Just pass parameter values as keyword
+arguments of `chart` function:
+
+```jinja
+{% raw %}
+{{ chart("tutorial.charts.CarsColumnHistogram", column="Miles_per_Gallon") }}
+{% endraw %}
+```
+
+{{ chart("docs.charts.tutorial.CarsColumnHistogram", column="Miles_per_Gallon") }}
+
+
+## Loop over the dataset's columns
+
+How do we make such a chart for each numeric column in `Cars` dataset? We loop over them,
+and this is where Jinja2's `for` directive comes in handy.
+
+```jinja
+{% raw %}
+{% for column in cars.columns }}
+{% if (cars[column].dtype | string) in ("int64", "float64") %}
+### {{ column }}
+{{ chart("tutorial.charts.CarsColumnHistogram", column=column) }}
+{% endif %}
+{% endfor %}
+{% endraw %}
+```
+
+There's a lot going on here, so let's walk this through. First, there's a
+`for` loop, selects each column in `cars` DataFrame.
+
+Inside of each loop cycle, we have to decide whether to make a histogram at all. Not all
+columns are suitable for making a histogram: for example, there's a car name, and
+there's no way of making a histogram for that.
+
+We take a `dtype` of each column, convert it to string with
+`(cars[columns].dtype | string)` and see if it's an `int64` or `float64`. If it is, we
+output a header with column name (`### {{ '{{' }} column {{ '}}' }}`) and a corresponding chart:
+`chart("tutorial.charts.CarsColumnHistogram", column=column)`.
+
+`render` method will get a different `column` argument value for each chart, so we'll make a histogram of each suitable column in `Cars`.
+
+In the end, our page will look like this:
+
+```jinja
+{% raw %}
+{% set cars = DataFrame("docs.datasets.Cars") %}
+
+# Vega dataset: __Cars__
+
+The dataset contains {{ cars.shape[1] | big | strong }} columns and
+{{ cars.shape[0] | big | strong }} rows.
+
+## Dataset summary
+
+{{ cars.describe() | table(max_rows=None) }}
+
+
+## Columns
+
+{% for column in cars.columns %}
+{% if (cars[column].dtype | string) in ("int64", "float64") %}
+
+### {{ column }}
+{{ chart("tutorial.charts.CarsColumnHistogram", column=column) }}
+
+{% endif %}
+{% endfor %}
+{% endraw %}
+```
+
+
+<iframe class="embed" src="/pages/docs/tutorial/examples/make_parametrized_charts_1?_embed=" style="height: 50em;"></iframe>
+
+{{ nav() }}

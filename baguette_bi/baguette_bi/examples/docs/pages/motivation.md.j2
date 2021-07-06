@@ -1,0 +1,67 @@
+{% include "header.md.j2" %}
+
+# Motivation
+
+🥖 Baguette BI was born out of the authors' frustration with conventional BI tools. Here
+are a few things we were thinking about (and we are _still_ thinking about them) while
+making it.
+
+## 🎳 Teamwork is difficult
+
+Most tools (known to us) make use of point-and-click interfaces for authoring. It certainly
+lowers the barriers for entry, but makes reviewing and deploying changes a tedious, error-prone
+and manual process. It's hard to know what changed between deployments without asking the
+author or clicking through a bunch of windows. Reviewing is done post-hoc or, more often,
+not done at all.
+
+The answer to these problems in conventional software development is version control.
+It allows for code review, automatic testing and continuous integration. These IT
+ops practices are standard in software engineering, but the world of BI has mostly
+missed them, despite the fact that in the end BI _is_ software engineering.
+
+We believe that code is a superior medium in terms of team communication.
+
+It might be scary in the beginning, but is worth it in the long run. It makes teams
+easier to scale and difficult stuff easier to automate.
+
+## 🍳 Things break often
+
+The trust of business stakeholders is essential for successful work of data teams. That
+trust is hard to maintain if your BI system is unreliable and it's easy to make a mistake
+that will affect the end users.
+
+Software developers test their products. Output of conventional BI tools is
+notoriously hard to test.
+
+We believe that modern data products should be easy to test, both stand-alone and in
+concert with other parts of your data ecosystem.
+
+You should be able to test your BI _and_ migrations in your data warehouse against your BI.
+
+## 🤸‍♀️ Dataviz is not flexible enough
+
+Most open-source BI tools we've tried offer a number of visualization types with some
+knobs and switches that provide minor tweaks. At the same time, there's a whole ecosystem
+of Python libraries based on the notion of composable _grammar of graphics_. They allow
+authors to make almost any visualization one can think of.
+
+These libraries often output charts that are ready to be published on the web, but
+there is a missing piece: you need to actually have the environment to publish them in.
+For that, you either need to know web development yourself, or have a framework that
+makes it easy to do so. Baguette's goal is to bridge that gap, enabling people who know
+how to make charts in Python to become BI developers.
+
+## 🚢 Navigation is a second-class citizen
+
+The traditional idiom in BI is a dashboard: a set of related charts with some control
+elements (filters etc). In a dashboard, navigation is a second-class citizen. Developers
+usually have to come up with different tricks to link between different parts of their
+BI system.
+
+In Baguette, there's no built-in navigation. Each combination of filters and parameters
+is a separate URL, and it's up to you how you structure your system. You generate links
+from data and display control elements exactly where you need them.
+
+This may sound limiting, but it forces you to really think about how users are going to
+find what they need. It also makes your data product holistic: not a set of atomic
+dashboards, but an interconnected web of knowledge.

@@ -1,0 +1,148 @@
+{% include "docs/styles.j2" %}
+
+{% macro nav() %}
+{% call row() %}
+{{ "👈 Install Baguette BI and set up a project" | link("docs/tutorial/index") }}
+{{ "☝️ Tutorial index" | link("docs/tutorial/index") }}
+{{ "Format the page 👉" | link("docs/tutorial/format_the_page") }}
+{% endcall %}
+{% endmacro %}
+
+{{ nav() }}
+
+# 👩‍💻 Get the data
+
+
+## What's a connection?
+
+A connection is something that knows how to access a data source and execute __queries__
+against it. There are several connections that are shipped with Baguette BI, but you can
+easily roll your own. A connections's job is:
+
+- authentication
+- query execution
+
+So, let's say, you have a data warehouse. You need to know how to connect to your particular
+flavour of database system, you need a host, port, login, password and database name.
+All this information constitutes a connection instance.
+
+If you have a Google Cloud service account and would like to connect to various
+Google spreadsheets, that's another connection instance.
+
+### VegaDatasetsConnection
+
+One of the built-in connections in Baguette BI is `VegaDatasetsConnection`. It's really
+simple, because you don't need any parameters whatsoever to connect. It gives you access
+to [vega-datasets](https://github.com/vega/vega-datasets), a number of sample datasets
+used mainly for demonstration purposes. If you ever saw an `iris` dataset (about flowers),
+it's in there too.
+
+
+## What's a dataset?
+
+A dataset is a way to retrieve data from a connection. You could say that a connection
+contains some number of potential datasets, and a dataset represents a particular query
+and a tabular result.
+
+### Create a dataset
+
+Now, lets's put it all together.
+
+```python
+from baguette_bi import bi
+
+vega = bi.VegaDatasetsConnection()
+
+
+class Cars(bi.Dataset):
+    connection = vega
+    query = "cars"
+```
+
+As you can see, the minimal amount of information a dataset requires is a connection
+instance and a query. A query can be an object of any type, which usually depends on
+the connection itself.
+
+- `VegaDatasetsConnection` requires a `str` query, which is a name of a dataset.
+- `SQLAlchemyConnection` (which we'll talk about later) takes an SQL query in the form
+of a `str` too.
+- We might also define a `MongoDBConnection` class, and then the query will be a `dict`,
+because that's what the MongoDB client expects.
+
+
+## Display some data on the page
+
+{% set cars = DataFrame("docs.datasets.Cars") %}
+
+You can access a project's datasets in your page template as a Pandas DataFrame. For
+that, call `DataFrame` function with a `.`-delimited path of the dataset in your module.
+If you put the `Cars` class in `datasets.py` file inside your the `tutorial` project, the
+path will be `tutorial.datasets.Cars`, so:
+
+```jinja
+DataFrame("tutorial.datasets.Cars")
+```
+
+To display a DataFrame as a table, pass is through `table` filter:
+
+```jinja
+{% raw %}
+{{ DataFrame("tutorial.datasets.Cars") | table }}
+{% endraw %}
+```
+
+{{ cars | table }}
+
+By default, the table is displayed in an abbreviated form. You can control this behaviour
+with `max_rows` argument, which defaults to `10`.
+
+```jinja
+{% raw %}
+{{ DataFrame("docs.datasets.Cars") | table(max_rows=4) }}
+{% endraw %}
+```
+
+Under the hood, `table` just calls `pandas.DataFrame.to_html()`, so for a full list of
+available options, consult with
+[Pandas documentation](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.to_html.html).
+There are some defaults that make it look nicer:
+
+- `max_rows=10`
+- `classes=["table", "table-sm"]` — these are for Bootstrap
+- `border=0`
+
+## Reuse the same DataFrame multiple times
+
+Each time you call `DataFrame` inside your page, Baguette BI will query the underlying
+connection. This is not optimal, so it's a good practice to assign the DataFrame to a
+variable and then use it afterwards. You can do it with Jinja2's `set` directive:
+
+```jinja
+{% raw %}
+{% set cars = DataFrame("tutorial.datasets.Cars") %}
+{% endraw %}
+```
+
+Now we can just use the `cars` variable. Let's try to make a page describing the dataset.
+
+```jinja
+{% raw %}
+{% set cars = DataFrame("tutorial.datasets.Cars") %}
+
+# Vega dataset: __Cars__
+
+The dataset contains {{ cars.shape[1] }} columns and
+{{ cars.shape[0] }} rows.
+
+## Dataset summary
+
+{{ cars.describe() | table(max_rows=None) }}
+{% endraw %}
+```
+
+<iframe class="embed" src="/pages/docs/tutorial/examples/get_the_data_1?_embed=" style="height: 30em;"></iframe>
+
+In the next section, we'll discuss the ways in which you can control how the content of
+your page is displayed.
+
+{{ nav() }}

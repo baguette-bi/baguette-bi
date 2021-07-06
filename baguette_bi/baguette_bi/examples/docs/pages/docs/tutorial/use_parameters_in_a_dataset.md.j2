@@ -1,0 +1,109 @@
+{% include "docs/styles.j2" %}
+
+{% macro nav() %}
+{% call row() %}
+{{ "👈 Create navigation" | link("docs/tutorial/create_navigation") }}
+{{ "☝️ Tutorial index" | link("docs/tutorial/index") }}
+{{ "Something 👉" | link("docs/tutorial/something") }}
+{% endcall %}
+{% endmacro %}
+
+{{ nav() }}
+
+
+# 🃏 Use parameters in a dataset
+
+Just like charts, datasets can be parametrized. We can declare which parameters we need
+and then use them with Jinja2 templates inside the query. Sounds complicated? Let's get
+back to our example.
+
+
+## Request a parameter inside a dataset
+
+Let's define a new dataset in `datasets.py`. It will request a `dataset_name` parameter,
+which is a required `str`. Let's skip the query for now.
+
+``` { .python hl_lines="4 5" }
+class AnyVegaDataset(bi.Dataset):
+    connection = vega
+
+    class Parameters:
+        dataset_name: str
+```
+
+We define a `Parameters` class inside our dataset class and specify class attributes
+with type annotations and defaults (if a parameter is optional). If you're familiar with
+[Pydantic](https://pydantic-docs.helpmanual.io/usage/types/), it looks very much like a
+Pydantic model, because it is. Behind the scenes, we're using that library to provide
+type conversion and validation.
+
+Parameters can be of any non-collection standard library type
+[supported by Pydantic](https://pydantic-docs.helpmanual.io/usage/types/#standard-library-types):
+
+- `str`
+- `bool`
+- `int`
+- `float`
+- `datetime.date`
+- `datetime.datetime`
+- `datetime.time`
+
+
+Now we can use `dataset_name` inside the query:
+
+``` { .python hl_lines="3" }
+class AnyVegaDataset(bi.Dataset):
+    connection = vega
+    query = "{{ '{{' }} dataset_name {{ '}}' }}"
+
+    class Parameters:
+        dataset_name: str
+```
+
+
+## Create a universal summary page
+
+There's one thing left to do: make a chart that requests `AnyVegaDataset` and plots a
+histogram of column values:
+
+```python
+class AnyVegaDatasetColumnHistogram(bi.AltairChart):
+    def render(self, column: str, df: pd.DataFrame = AnyVegaDataset):
+        return (
+            alt.Chart(df)
+            .mark_bar()
+            .encode(x=alt.X(f"{column}:Q", bin=True), y="count()")
+        )
+```
+
+It looks pretty much the same, except for the dataset used. The page looks the same too,
+we just replace the dataset and the chart:
+
+```jinja
+{% raw %}
+{% set df = DataFrame("tutorial.datasets.AnyVegaDataset") %}
+
+# Vega dataset: {{ params.dataset_name | strong }}
+
+{{ params.dataset_name | strong }} dataset contains
+{{ df.shape[1] | big | strong }} columns and
+{{ df.shape[0] | big | strong }} rows.
+
+## Dataset summary
+
+{{ df.describe() | table(max_rows=None) }}
+
+## Columns
+{% for column in df.columns %}
+{% if (df[column].dtype | string) in ("int64", "float64") %}
+### {{ column }}
+{{ chart("tutorial.charts.AnyVegaDatasetColumnHistogram", column=column) }}
+{% endif %}
+{% endfor %}
+{% endraw %}
+```
+
+This is it for the introductory tutorial. You can see the final result
+{{ "here" | link("docs/tutorial/examples/final/index") }}.
+
+{{ nav() }}

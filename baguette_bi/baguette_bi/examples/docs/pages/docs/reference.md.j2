@@ -1,0 +1,167 @@
+{% include "header.md.j2" %}
+
+# 🤔 Pages Reference
+
+This is a non-exhautive list of everything that can be done in Baguette BI pages. In
+short, pages are built with Markdown and Jinja2. First, the template is resolved and then,
+the resulting Markdown document is converted to HTML.
+
+Before reading
+this, make sure you're familiar with
+[Markdown syntax](https://daringfireball.net/projects/markdown/)
+and
+[Jinja2 templating language](https://jinja.palletsprojects.com/).
+
+[TOC]
+
+## Working with datasets
+
+For the most part, you will build your pages by interacting with Pandas DataFrames.
+Getting a dataframe inside a page is easy: just call `DataFrame` function and pass an
+`.`-delimited "address" of the dataset class in your package.
+
+```plaintext
+{{ '{{' }}  DataFrame("docs.datasets.basic.Dates") {{ '}}' }}
+```
+
+## Markdown extensions
+
+This is not supposed to be a full reference of Markdown syntax. For full documentation, see
+[John Gruber's site](https://daringfireball.net/projects/markdown/).
+
+At the same time, there are two Markdown extensions enabled by default, `toc` (table of
+contents) and `fenced_code`.
+
+### Table of Contents
+
+To generate a table of contents for the document, just type:
+
+```plaintext
+[TOC]
+```
+
+Table of contents at the top of this page is generated this way.
+
+
+### Fenced code block
+
+By default, if you want to display a code block in Markdown, you have to indent the text
+with 4 spaces or one `<tab>`. This is not optimal, so there's another way with `fenced_code`
+extension.
+
+Just type in triple backticks like this:
+
+```
+ ```
+ your code
+ ```
+```
+
+Syntax highlighting is available. By default, language is
+auto-detected. If you'd like to specity a known programming language, you can specify it
+after the first set of backticks, like this:
+
+```markdown
+ ```python
+ import os
+
+ something = os.getenv("something")
+ print(something, "else")  # comment
+ ```
+```
+
+This will produce the following output:
+
+```python
+import os
+
+something = os.getenv("something")
+print(something, "else")  # comment
+```
+
+If you'd like to disable highligting, just specify `text` as a language:
+
+```markdown
+ ```text
+ import os
+
+ something = os.getenv("something")
+ print(something, "else")
+ ```
+```
+
+
+## Markdown helpers
+
+Somethimes, you want to embed a calculated value into a page, like this:
+
+```plaintext
+{{ '{{' }} df["column"].sum() {{ '}}' }}
+```
+
+At the same time, you might want to apply some formatting to it, for example, make the
+text bold:
+
+```plaintext
+__{{ '{{' }} df["column"].sum() {{ '}}' }}__
+```
+
+This is ugly, so to avoid this, there's a set of filters designed to help you format
+calculated values.
+
+### strong, em, big, small
+
+```plaintext
+- {{ '{{' }} 'strong' | strong {{ '}}' }}
+- {{ '{{' }} 'em' | em {{ '}}' }}
+- {{ '{{' }} 'big' | big {{ '}}' }}
+- {{ '{{' }} 'small' | small {{ '}}' }}
+- {{ '{{' }} 'muted' | muted {{ '}}' }}
+```
+
+Outputs this:
+
+- {{ 'text' | strong }}
+- {{ 'text' | em }}
+- {{ 'text' | big }}
+- {{ 'text' | small }}
+- {{ 'text' | muted }}
+
+### Wrapping text in parentheses
+
+You can wrap a value in parentheses with `paren` filter:
+
+```plaintext
+{{ '{{' }} 'in parentheses' | paren {{ '}}' }}
+```
+
+{{ 'in parentheses' | paren }}
+
+### Combining helper filters
+
+Helper filters (and others) can be combined in an arbitrary way:
+
+```plaintext
+- {{ '{{' }} 'big and strong' | big | strong {{ '}}' }}
+- {{ '{{' }} 'small and em' | small | em {{ '}}' }}
+```
+
+- {{ 'big and strong' | big | strong }}
+- {{ 'small and em' | small | em }}
+
+```plaintext
+#### {{ '{{' }} 'This header isn\'t supposed to be in TOC' {{ '}}' }} {{ '{{' }} 'it\'s and example' | paren | small_muted {{ '}}' }}
+```
+
+#### {{ 'This header isn\'t supposed to be in TOC'  }} {{ 'it\'s an example' | paren | muted | small }}
+
+
+## Locale-aware formatting numbers and time
+
+Formatting filters are just a wrapper around the [Babel package](http://babel.pocoo.org).
+So if you have time, make yourself familiar with it too (it's great!).
+
+By default, locale is taken from `locale` setting, but you can override it at any
+particular invocation of filter.
+
+### Formatting dates

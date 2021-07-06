@@ -1,19 +1,16 @@
 from unittest.mock import MagicMock
 
 import pytest
+
 from baguette_bi.core.dataset import Dataset
 
 
 @pytest.fixture
-def conn():
-    conn = MagicMock()
-    conn.dict.return_value = {}
-    return conn
+def ds():
+    class TestDataset(Dataset):
+        connection = MagicMock()
 
-
-@pytest.fixture
-def ds(conn):
-    return Dataset("test", "test", conn)
+    return TestDataset
 
 
 def test_hash(ds):
@@ -21,10 +18,10 @@ def test_hash(ds):
 
 
 def test_id(ds):
-    assert ds.id == "4e184628fa31f63a83f29ac224758a5b"
+    assert ds.id == "tests.test_core.test_dataset.TestDataset"
 
 
 def test_get_data(ds):
     ctx = MagicMock()
-    ds.get_data(ctx)
+    ds().get_data(ctx)
     assert ds.connection.execute.call_count == 1

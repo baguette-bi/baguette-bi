@@ -1,0 +1,10 @@
+{% set cars = DataFrame("docs.datasets.Cars") %}
+
+# Vega dataset: __Cars__
+
+The dataset contains {{ cars.shape[1] }} columns and
+{{ cars.shape[0] }} rows.
+
+## Dataset summary
+
+{{ cars.describe() | table(max_rows=None) }}

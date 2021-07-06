@@ -7,7 +7,9 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from . import wait_for
+from baguette_bi.server import models
+from baguette_bi.server.app import app
+from tests import wait_for
 
 
 def stop(name, fail=False):
@@ -46,12 +48,35 @@ def postgres_in_docker(port=5432):
 
 @pytest.fixture(scope="session")
 def db():
+    from baguette_bi.server.models.base import Base
+
     with postgres_in_docker() as uri:
         engine = create_engine(uri)
+        Base.metadata.create_all(engine)
         Session = sessionmaker(bind=engine)
-        yield Session()
+        session = Session()
+        yield session
+        session.close()
 
 
 @pytest.fixture(scope="session")
 def engine(db):
     yield db.bind
+
+
+@pytest.fixture(scope="function")
+def testuser(db):
+    user = models.User(username="test")
+    user.set_password("test")
+    db.add(user)
+    db.commit()
+    yield user
+    db.delete(user)
+    db.commit()
+
+
+@pytest.fixture(scope="function")
+def client():
+    from fastapi.testclient import TestClient
+
+    return TestClient(app)
