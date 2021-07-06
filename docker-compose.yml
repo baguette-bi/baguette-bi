@@ -12,9 +12,8 @@ services:
             - ./baguette_bi:/home/baguette/baguette_bi
         ports:
             - 8000:8000
-        depends_on: [db, redis]
-    redis:
-        image: redis
+        depends_on:
+            - db
     db:
         image: postgres:13.3-alpine
         environment:
