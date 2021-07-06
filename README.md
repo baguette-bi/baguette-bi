@@ -33,6 +33,10 @@ These things are not implemented yet, but will be in the future (in rough order 
 
 
 ## Release notes
+
+### 0.1.4
+- Fix bug that broke authentication
+
 ### 0.1.3
 
 - Authentication and user permissions
