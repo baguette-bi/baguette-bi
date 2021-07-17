@@ -74,6 +74,8 @@ def develop(
     reload: bool = True,
 ):
     os.environ["BAGUETTE_PROJECT"] = str(project)
+    os.environ["BAGUETTE_DEBUG"] = "yes"
+    os.environ["BAGUETTE_AUTH"] = "no"
     uvicorn.run(
         "baguette_bi.server.app:app",
         reload=reload,
