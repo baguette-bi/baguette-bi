@@ -1,4 +1,5 @@
 import inspect
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Dict
 from urllib.parse import urlencode, urljoin
@@ -173,3 +174,7 @@ def big_number(*args, **kwargs):
 
 pages.filters["table"] = table
 pages.filters["big_number"] = big_number
+
+pages.globals["date"] = date
+pages.globals["datetime"] = datetime
+pages.globals["timedelta"] = timedelta

@@ -31,7 +31,7 @@ class Settings(BaseSettings):
     title: str = "Baguette BI"
     locale: str = "en_US.UTF-8"
 
-    debug: bool = True
+    debug: bool = False
 
     class Config:
         env_file = ".env"
