@@ -1,6 +1,7 @@
 from fastapi import Depends, Form, Request, status
 
-from baguette_bi.server import exc, models, settings
+from baguette_bi.server import exc, models
+from baguette_bi.settings import settings
 from baguette_bi.server.db import Session, get_db
 
 

@@ -8,7 +8,8 @@ from babel import dates, numbers
 from jinja2 import Environment, FileSystemLoader, pass_context
 from jinja2.runtime import Macro
 
-from baguette_bi.server import project, settings, templates
+from baguette_bi.server import project, templates
+from baguette_bi.settings import settings
 
 inner = Environment(loader=FileSystemLoader(templates.path))
 pages = Environment(
