@@ -77,7 +77,7 @@ def db():
 
 
 @pytest.fixture(scope="session")
-def redis():
+def redis_client():
     with redis_in_docker() as client:
         yield client
 

@@ -24,9 +24,9 @@ class Settings(BaseSettings):
 
     cache: Literal["none", "redis"] = "none"
     cache_ttl: int = 60 * 20  # 20 minutes
-    redis_host: Optional[str] = None  # Disabled by default
-    redis_port: Optional[int] = 6379
-    redis_db: Optional[int] = 0
+    redis_host: str = "localhost"  # Disabled by default
+    redis_port: int = 6379
+    redis_db: int = 0
     redis_password: Optional[str] = None
 
     icon: str = "🥖"

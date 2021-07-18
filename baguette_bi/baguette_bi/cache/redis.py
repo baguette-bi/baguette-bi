@@ -5,6 +5,7 @@ import pandas as pd
 from redis import ConnectionPool, Redis
 
 from baguette_bi.cache.base import ConnectionCache
+from baguette_bi.settings import settings
 
 
 class RedisConnectionCache(ConnectionCache):
@@ -31,4 +32,4 @@ class RedisConnectionCache(ConnectionCache):
         with Redis(connection_pool=self.pool) as client:
             key = f"{connection_id}:{data_request_id}"
             data = pickle.dumps(df)
-            client.set(key, data)
+            client.set(key, data, ex=settings.cache_ttl)

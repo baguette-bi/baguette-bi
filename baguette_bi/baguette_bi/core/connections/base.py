@@ -25,7 +25,8 @@ class ConnectionMeta(type):
 
 
 class Connection(metaclass=ConnectionMeta):
-    type: str
+    id = None
+    type: str = None
 
     def __init__(self, **details):
         self.details = details
