@@ -3,7 +3,8 @@ from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 
-from baguette_bi.server import api, exc, settings, static, views
+from baguette_bi.server import api, exc, static, views
+from baguette_bi.settings import settings
 
 app = FastAPI(debug=settings.debug)
 app.mount("/static", StaticFiles(directory=static.path), name="static")

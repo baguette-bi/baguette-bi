@@ -4,8 +4,9 @@ from typing import Dict, Optional
 from fastapi import Depends, Request
 from fastapi.responses import HTMLResponse
 
-from baguette_bi.server import models, security, settings, static, templating
+from baguette_bi.server import models, security, static, templating
 from baguette_bi.server.project import Project, get_project
+from baguette_bi.settings import settings
 
 
 def template_context(

@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
-from baguette_bi.server import settings
+from baguette_bi.settings import settings
 
 engine = create_engine(settings.database_url)
 Session = scoped_session(sessionmaker(bind=engine))

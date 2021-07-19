@@ -4,6 +4,7 @@ from contextlib import contextmanager
 
 import psycopg2
 import pytest
+import redis
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -46,6 +47,22 @@ def postgres_in_docker(port=5432):
     stop(name)
 
 
+@contextmanager
+def redis_in_docker(port=6379):
+    name = "baguette-bi-test-redis"
+    cmd = shlex.split(f"docker run -d --rm -p {port}:6379 --name {name} " "redis")
+    subprocess.check_call(cmd)
+
+    def redis_up():
+        client = redis.Redis(port=port)
+        client.exists("test")
+        return client
+
+    yield wait_for(redis_up, 30, 1)
+
+    stop(name)
+
+
 @pytest.fixture(scope="session")
 def db():
     from baguette_bi.server.models.base import Base
@@ -57,6 +74,12 @@ def db():
         session = Session()
         yield session
         session.close()
+
+
+@pytest.fixture(scope="session")
+def redis_client():
+    with redis_in_docker() as client:
+        yield client
 
 
 @pytest.fixture(scope="session")

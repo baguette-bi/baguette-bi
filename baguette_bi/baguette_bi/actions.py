@@ -11,7 +11,8 @@ from sqlalchemy.exc import IntegrityError
 from baguette_bi.examples import docs
 from baguette_bi.examples import new as _new
 from baguette_bi.exc import Conflict, NotFound
-from baguette_bi.server import db, models, settings
+from baguette_bi.server import db, models
+from baguette_bi.settings import settings
 
 get_db = contextmanager(db.get_db)
 

@@ -1,12 +1,12 @@
 [tool.poetry]
 name = "baguette_bi"
-version = "0.1.5"
+version = "0.1.6"
 description = ""
 authors = ["Mikhail Akimov <rovinj.akimov@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-fastapi = { extras = ["dotenv"], version = "^0.65.1" }
+fastapi = "^0.65.1"
 SQLAlchemy = "^1.4.15"
 typer = "^0.3.2"
 itsdangerous = "^2.0.1"
@@ -27,15 +27,14 @@ Pygments = "^2.9.0"
 gunicorn = "^20.1.0"
 uvloop = "^0.15.2"
 httptools = "^0.2.0"
+redis = "^3.5.3"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.4"
 black = "^21.5b1"
 flake8 = "^3.9.2"
 isort = "^5.8.0"
-mkdocs = "^1.1.2"
 pytest-cov = { extras = ["toml"], version = "^2.12.1" }
-mkdocs-material = "^7.1.6"
 
 [tool.poetry.scripts]
 baguette = "baguette_bi.cli:app"

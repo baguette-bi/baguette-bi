@@ -7,7 +7,8 @@ from jinja2.exceptions import TemplateNotFound
 from markdown import Markdown
 
 from baguette_bi.core import RenderContext
-from baguette_bi.server import exc, models, security, settings
+from baguette_bi.server import exc, models, security
+from baguette_bi.settings import settings
 from baguette_bi.server.project import Project, get_project
 from baguette_bi.server.views.utils import (
     get_locale_definition,

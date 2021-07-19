@@ -3,7 +3,10 @@ from typing import Any, Dict, Protocol
 import pandas as pd
 import pydantic
 
+from baguette_bi.cache import get_cache
 from baguette_bi.core.data_request import DataRequest
+
+cache = get_cache()
 
 
 class Connectable(Protocol):
@@ -37,8 +40,12 @@ class Dataset(metaclass=DatasetMeta):
     def get_data(self, render_context) -> pd.DataFrame:
         parameters = self.__parameters_model__.parse_obj(render_context.parameters)
         request = DataRequest(query=self.query, parameters=parameters.dict())
-        df = self.connection.execute(request)
-        return self.transform(df)
+        cached = cache.get(self.connection.id, request.id)
+        if cached is not None:
+            return cached
+        df = self.transform(self.connection.execute(request))
+        cache.set(self.connection.id, request.id, df)
+        return df
 
     def transform(self, df: pd.DataFrame) -> pd.DataFrame:
         return df
