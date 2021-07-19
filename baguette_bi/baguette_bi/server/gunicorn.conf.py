@@ -1,4 +1,5 @@
-from baguette_bi.settings import settings, startup
+from baguette_bi.server import startup
+from baguette_bi.settings import settings
 
 wsgi_app = "baguette_bi.server.app:app"
 preload_app = True

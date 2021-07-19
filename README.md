@@ -34,6 +34,10 @@ These things are not implemented yet, but will be in the future (in rough order 
 
 ## Release notes
 
+### 0.1.6
+- better handling of https static assets
+- redis cache
+
 ### 0.1.5
 - better default for development and production mode
 - stdlib `date`, `datetime` and `timedelta` are available in page templates
