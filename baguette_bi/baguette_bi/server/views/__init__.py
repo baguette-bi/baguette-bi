@@ -4,24 +4,19 @@ from typing import Callable, Dict, Optional
 from fastapi import APIRouter, Depends, Request, status
 from fastapi.responses import RedirectResponse
 from jinja2.exceptions import TemplateNotFound
-from markdown import Markdown
 
 from baguette_bi.core import RenderContext
 from baguette_bi.server import exc, models, security
-from baguette_bi.settings import settings
+from baguette_bi.server.md import md
 from baguette_bi.server.project import Project, get_project
 from baguette_bi.server.views.utils import (
     get_locale_definition,
     template_context,
     templates,
 )
+from baguette_bi.settings import settings
 
 router = APIRouter()
-
-md = Markdown(extensions=["fenced_code", "codehilite", "toc"])
-
-router = APIRouter()
-
 locale = get_locale_definition()
 
 
@@ -61,8 +56,14 @@ def get_page(
             "page": path,
         }
     )
-    page = md.convert(template.render(context))
-    return render("pages.html.j2", page=page, _embed=_embed, locale=locale)
+    page, *sidebar = md.convert(template.render(context)).rsplit("===", maxsplit=1)
+    if len(sidebar) > 0:
+        sidebar = sidebar[0]
+    else:
+        sidebar = None
+    return render(
+        "pages.html.j2", page=page, sidebar=sidebar, _embed=_embed, locale=locale
+    )
 
 
 @router.get("/login/")
@@ -78,7 +79,12 @@ def get_login(
 
 @router.post("/login/", dependencies=[Depends(security.do_login)])
 def post_login(request: Request):
-    return RedirectResponse(request.url_for("index"), status_code=status.HTTP_302_FOUND)
+    redirect = request.session.pop("Redirect-After-Login", None)
+    if redirect is not None:
+        url = redirect
+    else:
+        url = request.url_for("index")
+    return RedirectResponse(url, status_code=status.HTTP_302_FOUND)
 
 
 @router.get("/logout/")
@@ -89,7 +95,10 @@ def get_logout(request: Request):
 
 def _get_dataframe(project: Project, parameters: Dict):
     def DataFrame(name: str, **kwargs):
-        ctx = RenderContext(parameters=parameters)
+        _parameters = {}
+        _parameters.update(parameters)
+        _parameters.update(kwargs)
+        ctx = RenderContext(parameters=_parameters)
         dataset = project.datasets[name]()
         return dataset.get_data(ctx)
 

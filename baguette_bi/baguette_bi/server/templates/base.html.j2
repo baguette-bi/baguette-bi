@@ -21,17 +21,12 @@
     </head>
 
     <body>
-    <div class="d-flex flex-md-row flex-column">
+    <div class="d-flex flex-md-row flex-column align-content-stretch" style="min-height: 100vh;">
         {% if not _embed %}
         {% include "elements/sidebar.html.j2" %}
         {% endif %}
 
-        <main class="main-container flex-fill">
-            <div class="container-fluid">
-                {% block content %}{% endblock %}
-            </div>
-        </main>
-
+        {% block content %}{% endblock %}
     </div>
 
 
