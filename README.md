@@ -34,6 +34,11 @@ These things are not implemented yet, but will be in the future (in rough order 
 
 ## Release notes
 
+### 0.1.7
+- sidebar
+- chart error handling on the frontend
+- redirect to requested page after successful login
+
 ### 0.1.6
 - better handling of https static assets
 - redis cache
