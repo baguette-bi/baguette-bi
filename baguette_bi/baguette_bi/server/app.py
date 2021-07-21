@@ -26,6 +26,6 @@ def handle_web_exception(request: Request, exc: exc.WebException):
         request.session["Redirect-After-Login"] = str(request.url)
         return RedirectResponse(
             request.url_for("get_login"),
-            307,
+            status.HTTP_302_FOUND,
         )
     return RedirectResponse(request.url_for("index"), 308)

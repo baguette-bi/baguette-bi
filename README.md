@@ -34,6 +34,9 @@ These things are not implemented yet, but will be in the future (in rough order 
 
 ## Release notes
 
+### 0.1.8
+- fix incorrent login flow (too many redirects)
+
 ### 0.1.7
 - sidebar
 - chart error handling on the frontend
