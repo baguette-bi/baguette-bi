@@ -11,12 +11,22 @@
 {% endblock head %}
 
 {% block content %}
-<div class="pages-page col-sm-12 col-md-10 col-lg-8 col-xl-6 mx-auto">
-{{ page | safe }}
+<div class="flex-fill">
+    <div class="pages-page mx-auto px-3">
+    {{ page | safe }}
+    </div>
 </div>
-{% if not _embed %}
-<footer style="height: 100px"></div>
+
+{% if sidebar %}
+<div class="pages-sidebar px-3">
+{{ sidebar | safe }}
+</div>
 {% endif %}
+
+{# {% if not _embed %}
+<footer style="height: 100px"></div>
+{% endif %} #}
+
 {% endblock content %}
 
 {% block bottom %}

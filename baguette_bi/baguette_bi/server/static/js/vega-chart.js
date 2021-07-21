@@ -10,26 +10,41 @@ function getChartParams(el) {
 
 
 async function postJSON(url, data) {
-    const res = await fetch(url, {
-        method: "POST",
-        body: JSON.stringify(data),
-        headers: {
-            "Content-Type": "application/json"
+    try {
+        const res = await fetch(url, {
+            method: "POST",
+            body: JSON.stringify(data),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+        if (res.status !== 200) {
+            return null
         }
-    })
-    return res.json()
+        return res.json()
+    } catch {
+        return null
+    }
 }
 
+
+function mountFail(el) {
+    const container = document.createElement("div");
+    container.className = "fail-container d-flex v-100 h-100 align-items-center justify-content-center";
+    const fail = document.createElement("i");
+    fail.className = "fail-icon bi-emoji-dizzy";
+    container.appendChild(fail);
+    el.replaceChildren(container);
+}
 
 async function mountChart(id, el) {
     const parameters = Object.assign(getURLParams(), getChartParams(el));
     const res = await postJSON(`/api/charts/${id}/render/`, { parameters });
-    if (typeof(res.traceback) !== "undefined") {
-        console.log(res.traceback);
-        alert("Error loading chart, please contact server administrator.");
-    } else {
-        await vegaEmbed(el, res, { actions: false, ...vegaLocale });
+    if (res === null) {
+        mountFail(el);
+        return
     }
+    await vegaEmbed(el, res, { actions: false, ...vegaLocale });
 }
 
 function mountAllCharts() {
