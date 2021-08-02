@@ -34,6 +34,11 @@ These things are not implemented yet, but will be in the future (in rough order 
 
 ## Release notes
 
+### 0.1.9
+- Admins and developers can see Python stacktrace when there's a server error
+- `set_params` filter for creating links manipulating parameter state on the same page
+
+
 ### 0.1.8
 - fix incorrent login flow (too many redirects)
 
