@@ -53,7 +53,7 @@ def get_page(
         {
             "DataFrame": _get_dataframe(project, request.query_params),
             "params": SimpleNamespace(**request.query_params),
-            "page": path,
+            "current_page": path,
         }
     )
     page, *sidebar = md.convert(template.render(context)).rsplit("===", maxsplit=1)

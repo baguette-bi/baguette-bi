@@ -9,42 +9,51 @@ function getChartParams(el) {
 }
 
 
-async function postJSON(url, data) {
-    try {
-        const res = await fetch(url, {
-            method: "POST",
-            body: JSON.stringify(data),
-            headers: {
-                "Content-Type": "application/json"
-            }
-        });
-        if (res.status !== 200) {
-            return null
-        }
-        return res.json()
-    } catch {
-        return null
+class ServerException {
+    constructor(traceback, status) {
+        this.traceback = traceback;
+        this.status = status;
     }
 }
 
 
-function mountFail(el) {
+async function postJSON(url, data) {
+    const res = await fetch(url, {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+    const resData = await res.json();
+    if (res.status !== 200) {
+        throw new ServerException(resData.traceback, res.status);
+    }
+    return resData
+}
+
+
+function mountFail(el, tb) {
     const container = document.createElement("div");
     container.className = "fail-container d-flex v-100 h-100 align-items-center justify-content-center";
-    const fail = document.createElement("i");
-    fail.className = "fail-icon bi-emoji-dizzy";
-    container.appendChild(fail);
+    if (typeof tb === "undefined") {
+        const fail = document.createElement("i");
+        fail.className = "fail-icon bi-emoji-dizzy";
+        container.appendChild(fail);
+    } else {
+        container.innerText = tb;
+    }
     el.replaceChildren(container);
 }
 
 async function mountChart(id, el) {
     const parameters = Object.assign(getURLParams(), getChartParams(el));
-    const res = await postJSON(`/api/charts/${id}/render/`, { parameters });
-    if (res === null) {
-        mountFail(el);
-        return
+    try {
+        const res = await postJSON(`/api/charts/${id}/render/`, { parameters });
+        await vegaEmbed(el, res, { actions: false, ...vegaLocale });
+    } catch (err) {
+        mountFail(el, err.traceback);
     }
-    await vegaEmbed(el, res, { actions: false, ...vegaLocale });
 }
 
 function mountAllCharts() {

@@ -6,7 +6,7 @@ from urllib.parse import urlencode, urljoin
 
 from babel import dates, numbers
 from jinja2 import Environment, FileSystemLoader, pass_context
-from jinja2.runtime import Macro
+from jinja2.runtime import Context, Macro
 
 from baguette_bi.server import project, templates
 from baguette_bi.settings import settings
@@ -158,11 +158,28 @@ def pages_url(path: str, params: Dict = None):
 
 
 def link(text: str, path: str, **params):
+    """Construct a link to an arbitrary page, with kwargs passed as query params."""
     url = pages_url(path, params)
     return pages_macros.module.mklink(url, text)
 
 
+@pass_context
+def set_params(ctx: Context, text: str, **kwargs):
+    """Construct a link to the current page, updating current query param values to
+    kwargs. Passing None in kwargs removes a param.
+    """
+    params = ctx["params"].__dict__
+    for k, v in kwargs.items():
+        if v is None and k in params:
+            del params[k]
+        elif v is not None:
+            params[k] = v
+    url = pages_url(ctx["current_page"], params=params)
+    return pages_macros.module.mklink(url, text)
+
+
 pages.filters["link"] = link
+pages.filters["set_params"] = set_params
 
 
 def table(df, **kwargs):
