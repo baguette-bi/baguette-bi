@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "baguette_bi"
-version = "0.1.9"
+version = "0.1.10"
 description = ""
 authors = ["Mikhail Akimov <rovinj.akimov@gmail.com>"]
 

@@ -168,7 +168,7 @@ def set_params(ctx: Context, text: str, **kwargs):
     """Construct a link to the current page, updating current query param values to
     kwargs. Passing None in kwargs removes a param.
     """
-    params = ctx["params"].__dict__
+    params = ctx["params"].__dict__.copy()
     for k, v in kwargs.items():
         if v is None and k in params:
             del params[k]
