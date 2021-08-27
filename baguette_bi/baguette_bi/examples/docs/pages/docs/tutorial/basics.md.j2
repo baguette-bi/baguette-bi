@@ -1,3 +1,14 @@
+{% include "docs/styles.j2" %}
+
+{% macro nav() %}
+{% call row() %}
+{{ "☝️ Tutorial index" | link("docs/tutorial/index") }}
+{{ "Get the data 👉" | link("docs/tutorial/get_the_data") }}
+{% endcall %}
+{% endmacro %}
+
+{{ nav() }}
+
 # 👋 Basics
 
 When developing with Baguette BI, you work on a __project__. When you deploy your project,
@@ -70,6 +81,8 @@ In addition to that, when Markdown and built-in Baguette helpers aren't enough, 
 always fall back to plain HTML and JavaScript. Any HTML is valid Markdown, so anything
 on your mind that's not covered by the framework can still be done.
 
+{{ "Pages reference" | link("docs/reference/pages") }}
+
 
 ## Connections
 
@@ -82,6 +95,8 @@ Baguette ships with several built-in connection types, but you can easily roll y
 One type of built-in connections is `SQLAlchemyConnection`. As is evident from the name,
 it supports any database that `SQLAlchemy` supports. You provide a driver name, host, port
 and other credentials when creating it, and you're ready to create datasets.
+
+{{ "Connections reference" | link("docs/reference/connections") }}
 
 
 ## Datasets
@@ -96,17 +111,21 @@ Google Spreadsheet if your connection is a Google service account.
 You can use Jinja inside queries too, so you can filter and aggregate your data in any
 way you want, depending on which page it's displayed on.
 
+{{ "Datasets reference" | link("docs/reference/datasets") }}
+
 
 ## Charts
 
 There's no Business Intelligence without charts, right? You can use the datasets than
 you defined to produce [Altair](https://altair-viz.github.io/gallery/) charts and embed
 them inside pages. Charts, like datasets, can be easily parametrized to control
-how they're displayed based on user input and which page they're displayed on.
+how they're displayed based on user input and which page they're embedded in.
 
 Right now only Altair charts are supported, but in the future, we'll add support for more
 open-source charting libraries, most likely first candidate being
 [Bokeh](https://docs.bokeh.org/en/latest/docs/gallery.html).
+
+{{ "Charts reference" | link("docs/reference/charts") }}
 
 
 ## Users
@@ -114,3 +133,8 @@ open-source charting libraries, most likely first candidate being
 Baguette ships with optional authentication. In a business setting, you want to protect
 your insights and control access to your project. You can create user accounts via CLI,
 set passwords etc.
+
+{{ "CLI reference" | link("docs/reference/cli") }}
+
+
+{{ nav() }}

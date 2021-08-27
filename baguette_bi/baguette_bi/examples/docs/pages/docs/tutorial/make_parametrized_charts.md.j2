@@ -63,11 +63,11 @@ arguments of `chart` function:
 
 ```jinja
 {% raw %}
-{{ chart("tutorial.charts.CarsColumnHistogram", column="Miles_per_Gallon") }}
+{{ chart("tutorial.charts:CarsColumnHistogram", column="Miles_per_Gallon") }}
 {% endraw %}
 ```
 
-{{ chart("docs.charts.tutorial.CarsColumnHistogram", column="Miles_per_Gallon") }}
+{{ chart("docs.charts.tutorial:CarsColumnHistogram", column="Miles_per_Gallon") }}
 
 
 ## Loop over the dataset's columns
@@ -80,7 +80,7 @@ and this is where Jinja2's `for` directive comes in handy.
 {% for column in cars.columns }}
 {% if (cars[column].dtype | string) in ("int64", "float64") %}
 ### {{ column }}
-{{ chart("tutorial.charts.CarsColumnHistogram", column=column) }}
+{{ chart("tutorial.charts:CarsColumnHistogram", column=column) }}
 {% endif %}
 {% endfor %}
 {% endraw %}
@@ -96,7 +96,7 @@ there's no way of making a histogram for that.
 We take a `dtype` of each column, convert it to string with
 `(cars[columns].dtype | string)` and see if it's an `int64` or `float64`. If it is, we
 output a header with column name (`### {{ '{{' }} column {{ '}}' }}`) and a corresponding chart:
-`chart("tutorial.charts.CarsColumnHistogram", column=column)`.
+`chart("tutorial.charts:CarsColumnHistogram", column=column)`.
 
 `render` method will get a different `column` argument value for each chart, so we'll make a histogram of each suitable column in `Cars`.
 
@@ -104,7 +104,7 @@ In the end, our page will look like this:
 
 ```jinja
 {% raw %}
-{% set cars = DataFrame("docs.datasets.Cars") %}
+{% set cars = DataFrame("docs.datasets:Cars") %}
 
 # Vega dataset: __Cars__
 
@@ -122,7 +122,7 @@ The dataset contains {{ cars.shape[1] | big | strong }} columns and
 {% if (cars[column].dtype | string) in ("int64", "float64") %}
 
 ### {{ column }}
-{{ chart("tutorial.charts.CarsColumnHistogram", column=column) }}
+{{ chart("tutorial.charts:CarsColumnHistogram", column=column) }}
 
 {% endif %}
 {% endfor %}
