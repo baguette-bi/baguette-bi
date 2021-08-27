@@ -119,13 +119,13 @@ in `tutorial/charts/__init__.py`, it looks like this:
 
 ```jinja
 {% raw %}
-{{ chart("tutorial.charts.CarsHorsePowerHistogram") }}
+{{ chart("tutorial.charts:CarsHorsePowerHistogram") }}
 {% endraw %}
 ```
 
 And the result:
 
-{{ chart("docs.charts.tutorial.CarsHorsePowerHistogram", param1="x", param2=2) }}
+{{ chart("docs.charts.tutorial:CarsHorsePowerHistogram", param1="x", param2=2) }}
 
 
 ## Why request datasets?
@@ -161,7 +161,7 @@ Here's the final code for our page-in-progress:
 
 ```jinja
 {% raw %}
-{% set cars = DataFrame("docs.datasets.Cars") %}
+{% set cars = DataFrame("docs.datasets:Cars") %}
 
 # Vega dataset: __Cars__
 
@@ -174,7 +174,7 @@ The dataset contains {{ cars.shape[1] | big | strong }} columns and
 
 ## Horsepowers
 
-{{ chart("tutorial.charts.CarsHorsePowerHistogram") }}
+{{ chart("tutorial.charts:CarsHorsePowerHistogram") }}
 {% endraw %}
 ```
 

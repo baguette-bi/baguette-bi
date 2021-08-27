@@ -18,7 +18,7 @@ def test_hash(ds):
 
 
 def test_id(ds):
-    assert ds.id == "tests.test_core.test_dataset.TestDataset"
+    assert ds.id == "tests.test_core.test_dataset:TestDataset"
 
 
 def test_get_data(ds):

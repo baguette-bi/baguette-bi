@@ -1,5 +1,5 @@
 {% include "docs/styles.j2" %}
-{% set datasets = DataFrame("docs.datasets.VegaDatasetsList") %}
+{% set datasets = DataFrame("docs.datasets:VegaDatasetsList") %}
 
 {% macro nav() %}
 {% call row() %}
@@ -153,7 +153,7 @@ Now we can add our "dataset of datasets" to the page and count them:
 
 ```jinja
 {% raw %}
-{% set datasets = DataFrame("tutorial.datasets.VegaDatasetsList") %}
+{% set datasets = DataFrame("tutorial.datasets:VegaDatasetsList") %}
 
 # Vega datasets explorer
 
@@ -218,7 +218,7 @@ Now, let's look at our final index page:
 
 ```jinja
 {% raw %}
-{% set datasets = DataFrame("tutorial.datasets.VegaDatasetsList") %}
+{% set datasets = DataFrame("tutorial.datasets:VegaDatasetsList") %}
 
 # Vega datasets explorer
 

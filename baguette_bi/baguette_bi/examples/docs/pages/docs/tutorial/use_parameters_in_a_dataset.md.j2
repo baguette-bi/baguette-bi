@@ -81,7 +81,7 @@ we just replace the dataset and the chart:
 
 ```jinja
 {% raw %}
-{% set df = DataFrame("tutorial.datasets.AnyVegaDataset") %}
+{% set df = DataFrame("tutorial.datasets:AnyVegaDataset") %}
 
 # Vega dataset: {{ params.dataset_name | strong }}
 
@@ -97,7 +97,7 @@ we just replace the dataset and the chart:
 {% for column in df.columns %}
 {% if (df[column].dtype | string) in ("int64", "float64") %}
 ### {{ column }}
-{{ chart("tutorial.charts.AnyVegaDatasetColumnHistogram", column=column) }}
+{{ chart("tutorial.charts:AnyVegaDatasetColumnHistogram", column=column) }}
 {% endif %}
 {% endfor %}
 {% endraw %}

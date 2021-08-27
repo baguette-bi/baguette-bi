@@ -22,7 +22,7 @@ class DatasetMeta(type):
         cls.__parameters_model__ = pydantic.dataclasses.dataclass(
             cls.Parameters
         ).__pydantic_model__
-        cls.id = f"{cls.__module__}.{name}"
+        cls.id = f"{cls.__module__}:{name}"
         super().__init__(name, bases, attrs)
 
     def __hash__(self):

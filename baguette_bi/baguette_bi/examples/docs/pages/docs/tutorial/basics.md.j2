@@ -1,0 +1,140 @@
+{% include "docs/styles.j2" %}
+
+{% macro nav() %}
+{% call row() %}
+{{ "☝️ Tutorial index" | link("docs/tutorial/index") }}
+{{ "Get the data 👉" | link("docs/tutorial/get_the_data") }}
+{% endcall %}
+{% endmacro %}
+
+{{ nav() }}
+
+# 👋 Basics
+
+When developing with Baguette BI, you work on a __project__. When you deploy your project,
+Baguette will create a web app that will present your analytics to your end users. Think
+of your project as a wiki or a Notion workspace, but data-driven and up-to-date with your
+data sources.
+
+If you use Baguette as a Business Intelligence tool for your company
+{{ "which you should really consider!" | paren | muted }}, your team will probably work
+on a single project. If you're a data journalist pursuing a complex story, you'll create
+a project to cover that story and let your readers explore the underlying data.
+
+
+## So, what _is_ a project?
+
+A project is a [Python package](https://docs.python.org/3/tutorial/modules.html#packages).
+It's a set of Python and Markdown files structured in a special way. Inside a project,
+you define where your data is stored and how it should be presented.
+
+Make sure you read the
+[Python documentation on packages](https://docs.python.org/3/tutorial/modules.html#packages)
+first, but it's really nothing too complex. Let's take a look at the structure. You can
+create a new project scaffold by issuing `baguette new` command:
+
+```sh
+baguette new tutorial
+```
+
+Here's the resulting folder structure:
+
+```
+tutorial
+├── __init__.py
+├── charts  <-- this is a submodule
+│   └── __init__.py
+├── connections.py  <-- this is also a submodule
+├── datasets.py
+└── pages  <-- this is a special folder containing pages
+    └── index.md.j2
+```
+
+A package is a collection of modules. A module is either a `.py` file or a folder with
+a special `__init__.py` file in it. So, in the end, a package is created as a way to
+distribute Python code. You (and other people) can import functions and classes from it
+to use in your own projects or simple scripts. That's exactly what Baguette will do with
+your project: it will import your definitions and use them to create a nice data app
+for your users.
+
+The only difference with normal Python packages is that there's a special `pages`
+folder that holds, for now, a single file with `.md.j2` extension.
+
+
+## Pages
+
+Pages are what your users see and interact with. Everything you define in your Python
+files (mostly __datasets__ and __charts__), you will embed inside pages.
+
+Pages can also have links to other pages. This makes Baguette quite different from BI
+tools you might be used to: _navigation is a first-class citizen_. You data app is not
+just a collection of dashboards, but an interconnected web of knowledge. Say, you have
+a summary report that lists underperforming stores in a store chain. You can easily make
+each store link to a relevant page that will help investigate what exactly went wrong.
+
+Pages are defined with [Markdown](https://daringfireball.net/projects/markdown/) and can
+be templated with [Jinja](https://jinja.palletsprojects.com/en/3.0.x/). Any part of a
+page can be dynamically generated using your data. It's an extremely flexible way to
+present analytical insigts.
+
+In addition to that, when Markdown and built-in Baguette helpers aren't enough, you can
+always fall back to plain HTML and JavaScript. Any HTML is valid Markdown, so anything
+on your mind that's not covered by the framework can still be done.
+
+{{ "Pages reference" | link("docs/reference/pages") }}
+
+
+## Connections
+
+Connections describe ways to connect to data sources. You might have a connection to your
+Data Warehouse in your project, and another connection for data stored in Google Spreadsheets.
+
+Baguette ships with several built-in connection types, but you can easily roll your own.
+{# TODO: link to rolling your own connection tutorial #}
+
+One type of built-in connections is `SQLAlchemyConnection`. As is evident from the name,
+it supports any database that `SQLAlchemy` supports. You provide a driver name, host, port
+and other credentials when creating it, and you're ready to create datasets.
+
+{{ "Connections reference" | link("docs/reference/connections") }}
+
+
+## Datasets
+
+Datasets produce data tables that can be either directly displayed on a page as a table,
+or used to create charts. A dataset represents a __query__ that will be executed against
+a __connection__.
+
+A query can be an SQL query if you connect to a relational database, or a link to a
+Google Spreadsheet if your connection is a Google service account.
+
+You can use Jinja inside queries too, so you can filter and aggregate your data in any
+way you want, depending on which page it's displayed on.
+
+{{ "Datasets reference" | link("docs/reference/datasets") }}
+
+
+## Charts
+
+There's no Business Intelligence without charts, right? You can use the datasets than
+you defined to produce [Altair](https://altair-viz.github.io/gallery/) charts and embed
+them inside pages. Charts, like datasets, can be easily parametrized to control
+how they're displayed based on user input and which page they're embedded in.
+
+Right now only Altair charts are supported, but in the future, we'll add support for more
+open-source charting libraries, most likely first candidate being
+[Bokeh](https://docs.bokeh.org/en/latest/docs/gallery.html).
+
+{{ "Charts reference" | link("docs/reference/charts") }}
+
+
+## Users
+
+Baguette ships with optional authentication. In a business setting, you want to protect
+your insights and control access to your project. You can create user accounts via CLI,
+set passwords etc.
+
+{{ "CLI reference" | link("docs/reference/cli") }}
+
+
+{{ nav() }}

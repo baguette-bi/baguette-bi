@@ -1,27 +1,22 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 from typing import Dict
 
 from baguette_bi.core import context
 
 
-class ChartMeta(ABCMeta):
-    def __init__(cls, name, bases, attrs):
-        cls.id = f"{cls.__module__}.{name}"
-
-    def __hash__(self) -> int:
-        return hash(id(self))
-
-
-class Chart(metaclass=ChartMeta):
+class Chart(ABC):
     id = None
     rendering_engine = None
 
+    def __init_subclass__(cls):
+        cls.id = f"{cls.__module__}:{cls.__name__}"
+
     @abstractmethod
-    def render(self, *args, **kwargs):
+    def render(self, *args, **kwargs):  # pragma: no cover
         ...
 
     @abstractmethod
-    def rendered_to_dict(self, obj) -> Dict:
+    def rendered_to_dict(self, obj) -> Dict:  # pragma: no cover
         ...
 
     def get_rendered(self, ctx: context.RenderContext):

@@ -121,16 +121,9 @@ def text_paren(context, *args, **kwargs):
 
 
 pages.filters["format_percent"] = format_percent
-pages.filters["fpct"] = format_percent
-
 pages.filters["format_number"] = format_number
-pages.filters["fnum"] = format_number
-
 pages.filters["format_currency"] = format_currency
-pages.filters["fcur"] = format_currency
-
 pages.filters["format_date"] = format_date
-pages.filters["fdate"] = format_date
 
 pages.filters["strong"] = text_strong
 pages.filters["em"] = text_em

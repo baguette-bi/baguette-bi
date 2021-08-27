@@ -8,7 +8,7 @@
 {% endcall %}
 {% endmacro %}
 
-{% set cars = DataFrame("docs.datasets.Cars") %}
+{% set cars = DataFrame("docs.datasets:Cars") %}
 
 {{ nav() }}
 
@@ -77,7 +77,7 @@ In the end, you page should look something like this:
 
 ```jinja
 {% raw %}
-{% set cars = DataFrame("docs.datasets.Cars") %}
+{% set cars = DataFrame("docs.datasets:Cars") %}
 
 # Vega dataset: __Cars__
 

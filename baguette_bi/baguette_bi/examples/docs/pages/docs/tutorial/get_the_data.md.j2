@@ -72,7 +72,7 @@ because that's what the MongoDB client expects.
 
 ## Display some data on the page
 
-{% set cars = DataFrame("docs.datasets.Cars") %}
+{% set cars = DataFrame("docs.datasets:Cars") %}
 
 You can access a project's datasets in your page template as a Pandas DataFrame. For
 that, call `DataFrame` function with a `.`-delimited path of the dataset in your module.
@@ -80,14 +80,14 @@ If you put the `Cars` class in `datasets.py` file inside your the `tutorial` pro
 path will be `tutorial.datasets.Cars`, so:
 
 ```jinja
-DataFrame("tutorial.datasets.Cars")
+DataFrame("tutorial.datasets:Cars")
 ```
 
 To display a DataFrame as a table, pass is through `table` filter:
 
 ```jinja
 {% raw %}
-{{ DataFrame("tutorial.datasets.Cars") | table }}
+{{ DataFrame("tutorial.dataslts:Cars") | table }}
 {% endraw %}
 ```
 
@@ -98,7 +98,7 @@ with `max_rows` argument, which defaults to `10`.
 
 ```jinja
 {% raw %}
-{{ DataFrame("docs.datasets.Cars") | table(max_rows=4) }}
+{{ DataFrame("docs.datasets:Cars") | table(max_rows=4) }}
 {% endraw %}
 ```
 
@@ -119,7 +119,7 @@ variable and then use it afterwards. You can do it with Jinja2's `set` directive
 
 ```jinja
 {% raw %}
-{% set cars = DataFrame("tutorial.datasets.Cars") %}
+{% set cars = DataFrame("tutorial.datasets:Cars") %}
 {% endraw %}
 ```
 
@@ -127,7 +127,7 @@ Now we can just use the `cars` variable. Let's try to make a page describing the
 
 ```jinja
 {% raw %}
-{% set cars = DataFrame("tutorial.datasets.Cars") %}
+{% set cars = DataFrame("tutorial.datasets:Cars") %}
 
 # Vega dataset: __Cars__
 
