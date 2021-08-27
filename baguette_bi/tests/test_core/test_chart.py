@@ -1,15 +1,11 @@
 from unittest.mock import MagicMock
 
-from baguette_bi.core.chart import AltairChart, Chart
+from baguette_bi.core.chart import AltairChart
 from baguette_bi.core.context import RenderContext
 
 
 def test_generate_id():
-    assert Chart.id == "baguette_bi.core.chart.Chart"
-
-
-def test_hash():
-    assert hash(Chart) == hash(id(Chart))
+    assert AltairChart.id == "baguette_bi.core.chart:AltairChart"
 
 
 def test_altair_rendered_to_dict():
