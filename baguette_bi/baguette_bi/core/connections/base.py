@@ -19,18 +19,15 @@ def execute_wrapper(fn: Callable):
     return execute
 
 
-class ConnectionMeta(type):
-    def __init__(cls, name, bases, attrs):
-        cls.execute = execute_wrapper(cls.execute)
-
-
-class Connection(metaclass=ConnectionMeta):
-    id = None
+class Connection:
     type: str = None
 
     def __init__(self, **details):
         self.details = details
         self.id = md5(json.dumps(self.dict(), sort_keys=True).encode()).hexdigest()
+
+    def __init_subclass__(cls):
+        cls.execute = execute_wrapper(cls.execute)
 
     def dict(self):
         return {"type": self.type, "details": self.details}
