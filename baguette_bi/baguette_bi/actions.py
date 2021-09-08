@@ -170,3 +170,16 @@ def users_set_password(username: str, password: Optional[str] = None, n: int = 1
         db.commit()
     if password is None:
         return _password
+
+
+def _transform_renderer(spec: dict) -> dict:
+    pass
+
+
+def enable_transforms():
+    import altair as alt
+
+    from baguette_bi.altair.renderer import data_transform_renderer
+
+    alt.renderers.register("baguette_data_transform", data_transform_renderer)
+    alt.renderers.enable("baguette_data_transform")

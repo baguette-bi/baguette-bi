@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Dict
 
-from baguette_bi.core import context
+from baguette_bi.core.context import RenderContext
 
 
 class Chart(ABC):
@@ -19,16 +19,6 @@ class Chart(ABC):
     def rendered_to_dict(self, obj) -> Dict:  # pragma: no cover
         ...
 
-    def get_rendered(self, ctx: context.RenderContext):
-        return ctx.execute(self.render)
-
-    def get_definition(self, ctx: context.RenderContext):
-        obj = self.get_rendered(ctx)
+    def get_definition(self, ctx: RenderContext):
+        obj = ctx.execute(self.render)
         return self.rendered_to_dict(obj)
-
-
-class AltairChart(Chart):
-    rendering_engine: str = "vega-lite"
-
-    def rendered_to_dict(self, obj):
-        return obj.to_dict()

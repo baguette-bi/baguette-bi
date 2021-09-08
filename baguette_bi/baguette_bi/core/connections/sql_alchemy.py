@@ -4,10 +4,11 @@ from sqlalchemy.engine import create_engine
 from sqlalchemy.engine.url import URL
 
 from baguette_bi.core.connections.base import Connection
+from baguette_bi.core.connections.transforms.sql.base import BaseSQLTransformMixin
 from baguette_bi.core.data_request import DataRequest
 
 
-class SQLAlchemyConnection(Connection):
+class SQLAlchemyConnection(Connection, BaseSQLTransformMixin):
     type: str = "sql_alchemy"
 
     def __init__(
@@ -36,5 +37,7 @@ class SQLAlchemyConnection(Connection):
             self._engine = create_engine(self.url)
         return self._engine
 
-    def execute(self, req: DataRequest) -> pd.DataFrame:
-        return pd.read_sql(req.query, self.engine, params=req.parameters).fillna(np.nan)
+    def execute(self, request: DataRequest) -> pd.DataFrame:
+        return pd.read_sql(
+            request.query, self.engine, params=request.parameters
+        ).fillna(np.nan)
