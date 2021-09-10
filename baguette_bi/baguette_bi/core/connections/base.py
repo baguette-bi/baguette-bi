@@ -1,7 +1,6 @@
 import json
-from functools import wraps
 from hashlib import md5
-from typing import Callable
+from typing import Dict, Optional
 
 import altair as alt
 from jinja2 import Template
@@ -13,14 +12,6 @@ from baguette_bi.core.data_request import DataRequest
 cache = get_cache()
 
 
-def execute_wrapper(fn: Callable):
-    @wraps(fn)
-    def execute(self: "Connection", request: DataRequest):
-        return fn(self, self.prepare_request(request))
-
-    return execute
-
-
 class Connection(BaseTransformMixin):
     type: str = None
 
@@ -28,13 +19,10 @@ class Connection(BaseTransformMixin):
         self.details = details
         self.id = md5(json.dumps(self.dict(), sort_keys=True).encode()).hexdigest()
 
-    def __init_subclass__(cls):
-        cls.execute = execute_wrapper(cls.execute)
-
     def dict(self):
         return {"type": self.type, "details": self.details}
 
-    def prepare_request(self, request: DataRequest):
+    def prepare_query(self, request: DataRequest):
         query = Template(request.query).render(**request.parameters)
         for transform in request.transforms:
             if isinstance(transform, alt.AggregateTransform):
@@ -45,7 +33,12 @@ class Connection(BaseTransformMixin):
                 raise ValueError(
                     f"Transform {transform.__class__.__name__} is not supported yet"
                 )
-        return DataRequest(query=query, parameters=request.parameters)
+        if request.echo:
+            print(query)
+        return query, request.parameters
 
-    def execute(self, query):
+    def process_request(self, request: DataRequest):
+        return self.execute(*self.prepare_query(request))
+
+    def execute(self, query, parameters: Optional[Dict]):
         raise NotImplementedError

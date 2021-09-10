@@ -1,4 +1,4 @@
-from baguette_bi.actions import enable_transforms
+from baguette_bi.actions import disable_transforms, enable_transforms
 from baguette_bi.core import (
     AltairChart,
     Dataset,
@@ -9,6 +9,7 @@ from baguette_bi.core import (
 )
 
 __all__ = [
+    "disable_transforms",
     "enable_transforms",
     "VegaDatasetsConnection",
     "PostgresConnection",

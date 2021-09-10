@@ -5,7 +5,7 @@ from baguette_bi.altair.preprocess import (
     Chart,
     NotSupportedError,
     extract_aggregate,
-    extract_inline_transforms,
+    extract_inline_transforms_chart,
     extract_inline_transforms_facet,
     extract_inline_transforms_repeat,
 )
@@ -76,7 +76,7 @@ def test_extract_inline_tranforms_chart():
             y="sum(agg_field):Q",
         )
     )
-    spec = extract_inline_transforms(ch.to_dict())
+    spec = extract_inline_transforms_chart(ch.to_dict())
     newch = Chart(spec)
     assert len(newch.transform) == 1
     assert newch.transform[0].to_dict() == {

@@ -18,18 +18,16 @@ class RedisConnectionCache(ConnectionCache):
     ):
         self.pool = ConnectionPool(host=host, port=port, db=db, password=password)
 
-    def get(self, connection_id: str, data_request_id: str) -> Optional[pd.DataFrame]:
+    def get(self, data_request_id: str) -> Optional[pd.DataFrame]:
         with Redis(connection_pool=self.pool) as client:
-            key = f"{connection_id}:{data_request_id}"
-            if client.exists(key):
-                data = client.get(key)
+            if client.exists(data_request_id):
+                data = client.get(data_request_id)
                 try:
                     return pickle.loads(data)
                 except pickle.UnpicklingError:
-                    client.delete(key)
+                    client.delete(data_request_id)
 
-    def set(self, connection_id: str, data_request_id: str, df: pd.DataFrame):
+    def set(self, data_request_id: str, df: pd.DataFrame):
         with Redis(connection_pool=self.pool) as client:
-            key = f"{connection_id}:{data_request_id}"
             data = pickle.dumps(df)
-            client.set(key, data, ex=settings.cache_ttl)
+            client.set(data_request_id, data, ex=settings.cache_ttl)

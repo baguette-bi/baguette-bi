@@ -1,8 +1,8 @@
+from concurrent.futures import ThreadPoolExecutor
+
 import altair as alt
 
-from baguette_bi.altair.preprocess import extract_inline_transforms
-from baguette_bi.core.context import RenderContext
-from baguette_bi.core.dataset import Dataset
+from baguette_bi.altair.preprocess import gather_requests, preprocess
 
 VEGALITE_VERSION = alt.schema.SCHEMA_VERSION.lstrip("v")
 VEGA_VERSION = "5"
@@ -11,18 +11,16 @@ VEGAEMBED_VERSION = "6"
 
 class DataTransformRenderer(alt.utils.display.HTMLRenderer):
     def transform_spec(self, spec: dict) -> dict:
-        chart = alt.Chart.from_dict(spec)
-        chart = extract_inline_transforms(chart)
-        dataset = Dataset.main_registry.get(chart.data.name)()
-        transforms = None
-        if chart.transform != alt.Undefined:
-            transforms = chart.transform
-            chart.transform = alt.Undefined
-        # TODO: have a way to provide context interactively
-        data = dataset.get_data(RenderContext(), transforms)
+        chart = preprocess(alt.Chart.from_dict(spec))
+        requests = gather_requests(chart)
+        with ThreadPoolExecutor(10) as executor:
+            futures = executor.map(lambda r: (r.id, r.execute()), requests)
+            dataframes = {k: v for k, v in futures}
         if chart.datasets == alt.Undefined:
-            chart["datasets"] = {}
-        chart.datasets[chart.data.name] = data.to_dict(orient="records")
+            chart.datasets = {}
+        chart.datasets.update(
+            {k: v.to_dict(orient="records") for k, v in dataframes.items()}
+        )
         return chart.to_dict()
 
     def __call__(self, spec, **metadata):

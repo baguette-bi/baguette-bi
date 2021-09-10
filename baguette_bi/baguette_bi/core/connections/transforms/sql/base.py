@@ -65,4 +65,4 @@ class BaseSQLTransformMixin(BaseTransformMixin):
         )
 
     def transform_sample(self, prev: str, transform: alt.SampleTransform):
-        return f"{prev} limit {transform.sample}"
+        return f"select * from ({prev}) as t order by random() limit {transform.sample}"

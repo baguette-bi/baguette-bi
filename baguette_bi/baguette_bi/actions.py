@@ -172,10 +172,6 @@ def users_set_password(username: str, password: Optional[str] = None, n: int = 1
         return _password
 
 
-def _transform_renderer(spec: dict) -> dict:
-    pass
-
-
 def enable_transforms():
     import altair as alt
 
@@ -183,3 +179,9 @@ def enable_transforms():
 
     alt.renderers.register("baguette_data_transform", data_transform_renderer)
     alt.renderers.enable("baguette_data_transform")
+
+
+def disable_transforms():
+    import altair as alt
+
+    alt.renderers.enable("default")

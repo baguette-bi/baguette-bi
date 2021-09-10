@@ -1,125 +1,159 @@
-from typing import List, Tuple
+from typing import Optional, Union
 
 import altair as alt
 
-from baguette_bi.utils import Empty, NamespaceDict
+from baguette_bi.altair.utils import (
+    iterchannels,
+    itermulti,
+    iterspecs,
+    multi_charts,
+    multi_items,
+    prepend_transforms,
+    unit_charts,
+)
+from baguette_bi.core import Dataset
 
 
 class NotSupportedError(Exception):
     """When Altair feature is not supported yet"""
 
 
-types = ["concat", "vconcat", "hconcat", "layer", "repeat", "facet"]
-multiview_charts = types[:4]
-
-
-class Chart(NamespaceDict):
-    @property
-    def type(self):
-        for t in types:
-            if self.t != Empty:
-                return t
-        return "chart"
-
-    @property
-    def items(self):
-        if self.type in multiview_charts:
-            return self[self.type]
-
-    @items.setter
-    def items(self, vals: List):
-        if self.items is None:
-            raise TypeError("Chart is not compound")
-        self[self.type] = vals
-
-
-def iterchannels(encoding: alt.FacetedEncoding):
-    for channel_name in encoding.to_dict():
-        yield getattr(encoding, channel_name)
-
-
-def extract_aggregate(encoding) -> Tuple:
-    """Given view encoding, return extracted explicit AggregateTransform and a new
-    encoding without inline transforms.
-    If there are no aggregations, return (None, None)
+def aggregate_from_channel(channel) -> alt.AggregatedFieldDef:
+    """Given an encoding channel with inline aggregation, return a corresponding
+    altair.AggregatedFieldDef.
     """
+    if channel.field == alt.Undefined:  # basically, count(), no field
+        # channel, which didn't have a field before, gets one
+        channel.field = "Count of Records"
+        # and aggregate doesn't need a field
+        return alt.AggregatedFieldDef.from_dict(
+            {
+                "op": channel.aggregate.to_dict(),
+                "as": channel.field,
+            }
+        )
+    # normal case, just aggregate a field
+    agg_name = channel.aggregate.to_dict().capitalize()
+    alias = "{} of {}".format(agg_name, channel.field.to_dict())
+    return alt.AggregatedFieldDef.from_dict(
+        {
+            "op": channel.aggregate.to_dict(),
+            "field": channel.field.to_dict(),
+            "as": alias,
+        }
+    )
+
+
+def extract_inline_transforms_chart(chart: Union[alt.Chart, alt.UnitSpec]):
+    """Given a lowest-level non-composite chart, return a new chart with inline
+    transforms replaced with explicit ones.
+    """
+    if not isinstance(chart, unit_charts):
+        raise TypeError(
+            f"altair.Chart or altair.UnitSpec expected, got {chart.__class__.__name__}"
+        )
     groupby = []
-    aggregate = []
-    encoding = encoding.copy()
-    for channel in iterchannels(encoding):
+    aggregate = {}  # a dict to prevent duplicates
+    for channel in iterchannels(chart.encoding):
         if channel.aggregate != alt.Undefined:
-            if channel.field == alt.Undefined:  # basically, count()
-                aggregate.append(  # in this case, aggregate doesn't need a field
-                    alt.AggregatedFieldDef.from_dict(
-                        {
-                            "op": channel.aggregate.to_dict(),
-                            "as": channel.aggregate.to_dict(),
-                        }
-                    )
-                )
-                # and channel, which didn't have a field before, gets one
-                channel.field = channel.aggregate.to_dict()
-            else:  # normal case, just aggregate
-                aggregate.append(
-                    alt.AggregatedFieldDef.from_dict(
-                        {
-                            "op": channel.aggregate.to_dict(),
-                            "field": channel.field.to_dict(),
-                            "as": channel.field.to_dict(),
-                        }
-                    )
-                )
+            agg_def = aggregate_from_channel(channel)
+            alias = agg_def.to_dict()["as"]
+            aggregate[alias] = agg_def
             channel.aggregate = alt.Undefined
+            channel.field = alias
+        elif channel.bin != alt.Undefined:
+            raise NotImplementedError(
+                "Server-side bin transforms are not supported yet"
+            )
         else:
             groupby.append(channel.field.to_dict())
     if len(aggregate) > 0:
-        transform = alt.AggregateTransform(
-            groupby=groupby,
-            aggregate=aggregate,
+        agg_transform = alt.AggregateTransform(
+            groupby=groupby, aggregate=[agg for _, agg in aggregate.items()]
         )
-        return transform, encoding
-    return None, None
-
-
-def extract_inline_transforms_facet(obj):  # pragma: no cover
-    # TODO: support
-    raise NotSupportedError("Facet charts are not supported yet")
-    transform, encoding = extract_aggregate(obj.spec.encoding)
-    if obj.transform is Empty:
-        obj.transform = []
-    if obj.spec.transform is not Empty:
-        obj.transform.extend(obj.spec.transform)
-        obj.spec.transform = Empty
-    obj.transform.append(transform)
-    obj.spec.encoding = encoding
-
-
-def extract_inline_transforms_repeat(obj):  # pragma: no cover
-    # TODO: support
-    raise NotSupportedError("Repeat Charts are not supported yet")
-
-
-def extract_inline_transforms(chart) -> dict:
-    """Recursively go through embedded view definitions and turn inline transforms
-    into explicit ones. Returns a resulting spec dict.
-    """
-    # TODO: drunk, use altair class
-    # if chart.items is not None:
-    #     chart.items = [extract_inline_transforms(i) for i in chart.items]
-    # elif chart.type == "facet":
-    #     extract_inline_transforms_facet(chart)
-    # elif chart.type == "repeat":
-    #     extract_inline_transforms_repeat(chart)
-    if isinstance(chart, alt.Chart):
-        transform_aggregate, encoding = extract_aggregate(chart.encoding)
-        if transform_aggregate is not None:
-            if chart.transform == alt.Undefined:
-                chart.transform = [transform_aggregate]
-            else:
-                chart.transform.append(transform_aggregate)
-            chart.encoding = encoding
-    else:
-        raise NotImplementedError(
-            f"Chart class {chart.__class__.__name__} is not yet supported"
-        )
+        if chart.transform == alt.Undefined:
+            chart.transform = [agg_transform]
+        else:
+            chart.transform.append(agg_transform)
     return chart
+
+
+def extract_inline_transforms_multi(chart):
+    """Given an multiview Altair chart, return another one with inline transforms
+    turned explicit.
+    """
+    for item in itermulti(chart):
+        extract_inline_transforms(item)
+    return chart
+
+
+def extract_inline_transforms(chart):
+    if isinstance(chart, unit_charts):
+        return extract_inline_transforms_chart(chart)
+    elif isinstance(chart, multi_charts):
+        return extract_inline_transforms_multi(chart)
+    raise TypeError(f"Unsupported chart class: {chart.__class__.__name__}")
+
+
+AltairChartType = Union[
+    alt.Chart, alt.LayerChart, alt.ConcatChart, alt.HConcatChart, alt.VConcatChart
+]
+
+
+def resolve_data_references(
+    chart, data: Optional[alt.NamedData] = None, transforms: Optional[list] = None
+):
+    """Move altair.NamedData data to the actual chart unit specs."""
+    if isinstance(chart, alt.Chart):
+        return chart
+
+    if transforms is not None:  # copy just in case
+        transforms = [t.copy() for t in transforms]
+
+    if isinstance(chart, multi_charts):
+        if isinstance(chart.data, alt.NamedData):
+            data = chart.data
+        if transforms is not None:
+            chart = prepend_transforms(chart, transforms)
+            transforms = chart.transform
+        elif chart.transform != alt.Undefined:
+            transforms = chart.transform
+        items = multi_items(chart)
+        setattr(
+            chart,
+            items,
+            [
+                resolve_data_references(unit, data, transforms)
+                for unit in itermulti(chart)
+            ],
+        )
+        return chart
+
+    if isinstance(chart, unit_charts):
+        if data is not None:
+            chart.data = data.copy()
+        if transforms is not None:
+            chart = prepend_transforms(chart, transforms)
+        return chart
+
+
+def preprocess(chart: AltairChartType) -> AltairChartType:
+    """Given an Altair Chart, return a new chart with all inline transforms extracted."""
+    chart = extract_inline_transforms(chart)
+    return resolve_data_references(chart)
+
+
+def gather_requests(chart) -> list:
+    """Given a chart, look at each spec that has a NamedData and build a DataRequest
+    suitable for execution. Replace data name with request.id, remove transforms.
+    """
+    requests = set()
+    for spec in iterspecs(chart):
+        if isinstance(spec.data, alt.NamedData) and spec.data.name in Dataset.registry:
+            dataset = Dataset.registry.get(spec.data.name)
+            transforms = spec.transform if spec.transform != alt.Undefined else None
+            request = dataset.request(parameters=None, transforms=transforms)
+            requests.add(request)
+            spec.data.name = request.id
+            spec.transform = alt.Undefined
+    return requests

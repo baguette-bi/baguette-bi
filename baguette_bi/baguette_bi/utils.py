@@ -1,5 +1,5 @@
 from pprint import pformat
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
 
 class Empty:
@@ -74,3 +74,27 @@ class NamespaceDict:
 
     def __repr__(self):
         return str(self)
+
+
+types = ["concat", "vconcat", "hconcat", "layer", "repeat", "facet"]
+multiview_charts = types[:4]
+
+
+class Chart(NamespaceDict):
+    @property
+    def type(self):
+        for t in types:
+            if self.t != Empty:
+                return t
+        return "chart"
+
+    @property
+    def items(self):
+        if self.type in multiview_charts:
+            return self[self.type]
+
+    @items.setter
+    def items(self, vals: List):
+        if self.items is None:
+            raise TypeError("Chart is not compound")
+        self[self.type] = vals
