@@ -2,18 +2,13 @@ import json
 from hashlib import md5
 from typing import Dict, Optional
 
-import altair as alt
-from jinja2 import Template
-
-from baguette_bi.cache import get_cache
-from baguette_bi.core.connections.transforms.base import BaseTransformMixin
+from baguette_bi.core.connections.query_builders.base import BaseQueryBuilder
 from baguette_bi.core.data_request import DataRequest
 
-cache = get_cache()
 
-
-class Connection(BaseTransformMixin):
+class Connection:
     type: str = None
+    query_builder = BaseQueryBuilder()
 
     def __init__(self, **details):
         self.details = details
@@ -22,23 +17,13 @@ class Connection(BaseTransformMixin):
     def dict(self):
         return {"type": self.type, "details": self.details}
 
-    def prepare_query(self, request: DataRequest):
-        query = Template(request.query).render(**request.parameters)
-        for transform in request.transforms:
-            if isinstance(transform, alt.AggregateTransform):
-                query = self.transform_aggregate(query, transform)
-            elif isinstance(transform, alt.SampleTransform):
-                query = self.transform_sample(query, transform)
-            else:
-                raise ValueError(
-                    f"Transform {transform.__class__.__name__} is not supported yet"
-                )
+    def process_request(self, request: DataRequest):
+        query = self.query_builder.build(
+            request.query, request.parameters, request.transforms
+        )
         if request.echo:
             print(query)
-        return query, request.parameters
-
-    def process_request(self, request: DataRequest):
-        return self.execute(*self.prepare_query(request))
+        return self.execute(query, request.parameters)
 
     def execute(self, query, parameters: Optional[Dict]):
         raise NotImplementedError

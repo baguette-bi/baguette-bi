@@ -1,7 +1,15 @@
+from baguette_bi.core.connections.query_builders.sql.standard import (
+    StandardSQLQueryBuilder,
+)
 from baguette_bi.core.connections.sql_alchemy import SQLAlchemyConnection
-from baguette_bi.core.connections.transforms.sql.sqlite import SQLiteSQLTransformMixin
 
 
-class SQLiteConnection(SQLAlchemyConnection, SQLiteSQLTransformMixin):
+class SQLiteQueryBuilder(StandardSQLQueryBuilder):
+    pass
+
+
+class SQLiteConnection(SQLAlchemyConnection):
+    query_builder = SQLiteQueryBuilder()
+
     def __init__(self, file: str):
         super().__init__(driver="sqlite", database=file)

@@ -4,11 +4,14 @@ from sqlalchemy.engine import create_engine
 from sqlalchemy.engine.url import URL
 
 from baguette_bi.core.connections.base import Connection
-from baguette_bi.core.connections.transforms.sql.base import BaseSQLTransformMixin
+from baguette_bi.core.connections.query_builders.sql.standard import (
+    StandardSQLQueryBuilder,
+)
 
 
-class SQLAlchemyConnection(Connection, BaseSQLTransformMixin):
+class SQLAlchemyConnection(Connection):
     type: str = "sql_alchemy"
+    query_builder = StandardSQLQueryBuilder()
 
     def __init__(
         self,

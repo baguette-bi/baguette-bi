@@ -8,17 +8,13 @@ from babel import dates, numbers
 from jinja2 import Environment, FileSystemLoader, pass_context
 from jinja2.runtime import Context, Macro
 
-from baguette_bi.server import project, templates
+from baguette_bi.server import templates
 from baguette_bi.settings import settings
 
 inner = Environment(loader=FileSystemLoader(templates.path))
 pages = Environment(
     loader=FileSystemLoader(Path(settings.project).resolve() / settings.pages_dir)
 )
-
-
-def DataFrame(path: str):
-    return project.get_project().datasets.get(path).get_data()
 
 
 def _fmt(round: int, sep: bool):

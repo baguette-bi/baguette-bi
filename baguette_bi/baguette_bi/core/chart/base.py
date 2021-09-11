@@ -9,7 +9,7 @@ class Chart(ABC):
     rendering_engine = None
 
     def __init_subclass__(cls):
-        cls.id = f"{cls.__module__}:{cls.__name__}"
+        cls.id = f"{cls.__module__}.{cls.__name__}"
 
     @abstractmethod
     def render(self, *args, **kwargs):  # pragma: no cover

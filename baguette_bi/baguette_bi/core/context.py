@@ -44,9 +44,10 @@ class RenderContext:
         datasets = {}
         for name, par in inspect.signature(fn).parameters.items():
             if isinstance(par.default, DatasetMeta):
-                datasets[name] = par.default()
+                datasets[name] = par.default
         with ThreadPoolExecutor() as executor:
             futures = [
-                (k, executor.submit(v.get_data, self)) for k, v in datasets.items()
+                (k, executor.submit(v.get_data, self.parameters))
+                for k, v in datasets.items()
             ]
             return {k: v.result() for k, v in futures}

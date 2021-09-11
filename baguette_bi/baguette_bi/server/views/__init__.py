@@ -5,7 +5,6 @@ from fastapi import APIRouter, Depends, Request, status
 from fastapi.responses import RedirectResponse
 from jinja2.exceptions import TemplateNotFound
 
-from baguette_bi.core import RenderContext
 from baguette_bi.server import exc, models, security
 from baguette_bi.server.md import md
 from baguette_bi.server.project import Project, get_project
@@ -98,8 +97,7 @@ def _get_dataframe(project: Project, parameters: Dict):
         _parameters = {}
         _parameters.update(parameters)
         _parameters.update(kwargs)
-        ctx = RenderContext(parameters=_parameters)
-        dataset = project.datasets[name]()
-        return dataset.get_data(ctx)
+        dataset = project.datasets[name]
+        return dataset.get_data(_parameters)
 
     return DataFrame

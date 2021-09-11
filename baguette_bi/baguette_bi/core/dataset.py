@@ -25,7 +25,7 @@ class DatasetMeta(type):
         cls.__parameters_model__ = pydantic.dataclasses.dataclass(
             cls.Parameters
         ).__pydantic_model__
-        cls.id = f"{cls.__module__}:{name}"
+        cls.id = f"{cls.__module__}.{name}"
         cls.transform = classmethod(cls.transform)
         cls.registry[cls.id] = cls
         super().__init__(name, bases, attrs)
@@ -55,14 +55,14 @@ class DatasetMeta(type):
     def get_data(
         self, parameters: Optional[Dict] = None, transforms: Optional[List] = None
     ) -> pd.DataFrame:
-        return self.request(parameters, transforms).execute()
+        return self.transform(
+            self.request(parameters, transforms).execute(),
+        )
 
     def _repr_html_(self):
         """For Jupyter"""
         return (
-            self.request(
-                transforms=[alt.SampleTransform(sample=10)],
-            )
+            self.request(transforms=[alt.SampleTransform(sample=10)])
             .execute()
             .to_html()
         )
