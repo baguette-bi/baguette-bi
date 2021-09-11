@@ -1,0 +1,106 @@
+// Vega expressions grammar
+// https://vega.github.io/vega/docs/expressions/
+// precedence:
+// ()  group
+// _() function call
+// !   boolean negation
+// -   unary minus
+// **  pow
+// *   mul
+// /   div
+// %   mod
+// +   add
+// -   sub
+// <   lt
+// <=  lte
+// >   gt
+// >=  gte
+// ==  eq
+// !=  ne
+// === eq
+// !== ne
+// &&  and
+// ||  or
+// .?.:. tern
+
+// constants
+NAN: "NaN"
+NULL: "null"
+UNDEFINED: "undefined"
+E: "E"
+LN2: "LN2"
+LN10: "LN10"
+LOG2E: "LOG2E"
+LOG10E: "LOG10E"
+MAX_VALUE: "MAX_VALUE"
+MIN_VALUE: "MIN_VALUE"
+PI: "PI"
+SQRT1_2: "SQRT1_2"
+SQRT2: "SQRT2"
+?const: NAN | E | LN2 | LN10 | LOG2E | LOG10E | MAX_VALUE | MIN_VALUE | PI | SQRT1_2 | SQRT2
+
+// literals
+TRUE: "true"
+FALSE: "false"
+%import common.ESCAPED_STRING -> DOUBLE_QUOTES_STRING
+%import common._STRING_ESC_INNER
+SINGLE_QUOTES_STRING: "'" _STRING_ESC_INNER "'"
+STRING: SINGLE_QUOTES_STRING | DOUBLE_QUOTES_STRING
+%import common.SIGNED_INT     -> INTEGER
+%import common.SIGNED_NUMBER  -> NUMBER
+?literal: TRUE | FALSE | INTEGER | NUMBER | STRING
+
+// datum access
+IDENTIFIER: /[a-z_]\w*/i
+FIELD: IDENTIFIER
+
+?field: "datum." FIELD
+      | "datum['" FIELD "']"
+      | "datum[\"" FIELD "\"]"
+
+call: IDENTIFIER "(" [ op ("," op)* ]  ")"
+
+paren: "(" op ")"
+
+?atom: literal
+     | const
+     | field
+     | call
+     | paren
+
+?unary: atom | not_ | neg
+not_: "!" atom
+neg: "-" atom
+
+?pow: unary | pow "**" unary
+
+?mul_: pow | mul | div | mod
+mul: mul_ "*" pow
+div: mul_ "/" pow
+mod: mul_ "%" pow
+
+?add_: mul_ | add | sub
+add: add_ "+" mul_
+sub: add_ "-" mul_
+
+?gtlt: add_ | gt | gte | lt | lte
+gt: gtlt ">" add_
+gte: gtlt ">=" add_
+lt: gtlt "<" add_
+lte: gtlt "<=" add_
+
+?eq_: gtlt | eq | ne
+eq: eq_ ("==" | "===") gtlt
+ne: eq_ ("!=" | "!==") gtlt
+
+?bool: eq_ | and_ | or_
+and_: bool "&&" eq_
+or_: bool "||" eq_
+
+tern: op "?" op ":" op
+
+?op: bool | tern
+
+expr: op
+
+%ignore /\s/

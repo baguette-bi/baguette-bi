@@ -3,12 +3,9 @@ from typing import Any, Dict, List, Optional
 import altair as alt
 from jinja2 import Template
 
-
-class UnsupportedTransformBulderError(Exception):
-    def __init__(self, obj: "BaseQueryBuilder", transform: str):
-        super().__init__(
-            f"{obj.__class__.__name__}: {transform} transform is not supported."
-        )
+from baguette_bi.core.connections.query_builders.errors import (
+    UnsupportedTransformQueryBuilderError,
+)
 
 
 class BaseQueryBuilder:
@@ -50,55 +47,55 @@ class BaseQueryBuilder:
         return transform_function(prev, transform)
 
     def transform_aggregate(self, prev: Any, transform: alt.AggregateTransform):
-        raise UnsupportedTransformBulderError(self, "aggregate")
+        raise UnsupportedTransformQueryBuilderError(self, "aggregate")
 
     def transform_bin(self, prev: Any, transform: alt.BinTransform):
-        raise UnsupportedTransformBulderError(self, "bin")
+        raise UnsupportedTransformQueryBuilderError(self, "bin")
 
     def transform_calculate(self, prev: Any, transform: alt.CalculateTransform):
-        raise UnsupportedTransformBulderError(self, "calculate")
+        raise UnsupportedTransformQueryBuilderError(self, "calculate")
 
     def transform_density(self, prev: Any, transform: alt.DensityTransform):
-        raise UnsupportedTransformBulderError(self, "density")
+        raise UnsupportedTransformQueryBuilderError(self, "density")
 
     def transform_filter(self, prev: Any, transform: alt.FilterTransform):
-        raise UnsupportedTransformBulderError(self, "filter")
+        raise UnsupportedTransformQueryBuilderError(self, "filter")
 
     def transform_flatten(self, prev: Any, transform: alt.FlattenTransform):
-        raise UnsupportedTransformBulderError(self, "flatten")
+        raise UnsupportedTransformQueryBuilderError(self, "flatten")
 
     def transform_fold(self, prev: Any, transform: alt.FoldTransform):
-        raise UnsupportedTransformBulderError(self, "fold")
+        raise UnsupportedTransformQueryBuilderError(self, "fold")
 
     def transform_impute(self, prev: Any, transform: alt.ImputeTransform):
-        raise UnsupportedTransformBulderError(self, "impute")
+        raise UnsupportedTransformQueryBuilderError(self, "impute")
 
     def transform_joinaggregate(self, prev: Any, transform: alt.JoinAggregateTransform):
-        raise UnsupportedTransformBulderError(self, "joinaggregate")
+        raise UnsupportedTransformQueryBuilderError(self, "joinaggregate")
 
     def transform_lookup(self, prev: Any, transform: alt.LookupTransform):
-        raise UnsupportedTransformBulderError(self, "lookup")
+        raise UnsupportedTransformQueryBuilderError(self, "lookup")
 
     def transform_loess(self, prev: Any, transform: alt.LoessTransform):
-        raise UnsupportedTransformBulderError(self, "loess")
+        raise UnsupportedTransformQueryBuilderError(self, "loess")
 
     def transform_pivot(self, prev: Any, transform: alt.PivotTransform):
-        raise UnsupportedTransformBulderError(self, "pivot")
+        raise UnsupportedTransformQueryBuilderError(self, "pivot")
 
     def transform_quantile(self, prev: Any, transform: alt.QuantileTransform):
-        raise UnsupportedTransformBulderError(self, "quantile")
+        raise UnsupportedTransformQueryBuilderError(self, "quantile")
 
     def transform_regression(self, prev: Any, transform: alt.RegressionTransform):
-        raise UnsupportedTransformBulderError(self, "regression")
+        raise UnsupportedTransformQueryBuilderError(self, "regression")
 
     def transform_sample(self, prev: Any, transform: alt.SampleTransform):
-        raise UnsupportedTransformBulderError(self, "sample")
+        raise UnsupportedTransformQueryBuilderError(self, "sample")
 
     def transform_stack(self, prev: Any, transform: alt.StackTransform):
-        raise UnsupportedTransformBulderError(self, "stack")
+        raise UnsupportedTransformQueryBuilderError(self, "stack")
 
     def transform_timeunit(self, prev: Any, transform: alt.TimeUnitTransform):
-        raise UnsupportedTransformBulderError(self, "timeunit")
+        raise UnsupportedTransformQueryBuilderError(self, "timeunit")
 
     def transform_window(self, prev: Any, transform: alt.WindowTransform):
-        raise UnsupportedTransformBulderError(self, "window")
+        raise UnsupportedTransformQueryBuilderError(self, "window")

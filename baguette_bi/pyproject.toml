@@ -28,6 +28,7 @@ gunicorn = "^20.1.0"
 uvloop = "^0.15.2"
 httptools = "^0.2.0"
 redis = "^3.5.3"
+lark-parser = "^0.12.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.4"
