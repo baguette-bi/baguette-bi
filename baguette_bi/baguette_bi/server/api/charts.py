@@ -5,8 +5,8 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import JSONResponse
 
-from baguette_bi.core.context import RenderContext
 from baguette_bi.exc import NotFound
+from baguette_bi.render_context import RenderContext
 from baguette_bi.server import schema, security
 from baguette_bi.server.models import User
 from baguette_bi.server.project import Project, get_project

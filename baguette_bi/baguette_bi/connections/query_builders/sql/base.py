@@ -1,7 +1,5 @@
-from baguette_bi.core.connections.query_builders.base import BaseQueryBuilder
-from baguette_bi.core.connections.query_builders.sql.utils import (
-    NotImplementedSQLFunction,
-)
+from baguette_bi.connections.query_builders.base import BaseQueryBuilder
+from baguette_bi.connections.query_builders.sql.utils import NotImplementedSQLFunction
 
 
 class BaseSQLQueryBuilder(BaseQueryBuilder):

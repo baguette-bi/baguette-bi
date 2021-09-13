@@ -4,13 +4,18 @@ import altair as alt
 from jinja2 import Template
 from lark import Transformer
 
-from baguette_bi.altair.expr import parser
-from baguette_bi.core.connections.query_builders.sql.base import BaseSQLQueryBuilder
-from baguette_bi.core.connections.query_builders.sql.errors import (
+from baguette_bi.charts.altair.expr import parser
+from baguette_bi.connections.query_builders.sql.base import BaseSQLQueryBuilder
+from baguette_bi.connections.query_builders.sql.errors import (
     SQLExpressionCompilationError,
     SQLFunctionCompilationError,
+    SQLFunctionNotSupportedError,
+    raise_expression_incompatible,
+    raise_expression_not_supported,
+    raise_function_incompatible,
+    raise_function_not_supported,
 )
-from baguette_bi.core.connections.query_builders.sql.utils import (
+from baguette_bi.connections.query_builders.sql.utils import (
     NotImplementedSQLFunction,
     just_fn,
 )
@@ -45,14 +50,12 @@ class StandardSQLVegaExpressionTransformer(Transformer):
 
     # CONSTANTS
 
-    def NAN(self, token):
-        raise SQLExpressionCompilationError("NaN")
+    NAN = raise_expression_incompatible("NaN")
 
     def NULL(self, token):
         return "null"
 
-    def UNDEFINED(self, token):
-        raise SQLExpressionCompilationError("undefined")
+    UNDEFINED = raise_expression_incompatible("undefined")
 
     def E(self, token):
         return math.e
@@ -69,11 +72,8 @@ class StandardSQLVegaExpressionTransformer(Transformer):
     def LOG10E(self, token):
         return math.log10(math.e)
 
-    def MAX_VALUE(self, token):
-        raise SQLExpressionCompilationError("MAX_VALUE")
-
-    def MIN_VALUE(self, token):
-        raise SQLExpressionCompilationError("MIN_VALUE")
+    MAX_VALUE = raise_expression_incompatible("MAX_VALUE")
+    MIN_VALUE = raise_expression_incompatible("MIN_VALUE")
 
     def PI(self, token):
         return math.pi
@@ -140,7 +140,7 @@ class StandardSQLVegaExpressionTransformer(Transformer):
         fn, *args = token
         fn = "if_" if fn == "if" else fn
         if not hasattr(self, fn):
-            raise SQLFunctionCompilationError(fn)
+            raise SQLFunctionNotSupportedError(fn)
         fn = getattr(self, fn)
         return fn(args)
 
@@ -152,8 +152,8 @@ class StandardSQLVegaExpressionTransformer(Transformer):
     def if_(self, args):
         return self.tern(args)
 
-    # isNaN
-    # isFinite
+    isNaN = raise_function_incompatible("isNaN")
+    isFinite = raise_function_not_supported("isFinite")
 
     abs = just_call("abs")
     acos = just_call("acos")
@@ -183,11 +183,14 @@ class StandardSQLVegaExpressionTransformer(Transformer):
     tan = just_call("tan")
 
     now = just_call("sysdate")
-
-    # date
-
-
-transformer = StandardSQLVegaExpressionTransformer()
+    date = just_call("day")
+    day = raise_function_not_supported("day")
+    dayofyear = raise_function_not_supported("dayofyear")
+    year = just_call("year")
+    quarter = just_call("quarter")
+    month = just_call("month")
+    week = raise_function_not_supported("week")
+    hours = just_call("hour")
 
 
 class StandardSQLQueryBuilder(BaseSQLQueryBuilder):
@@ -196,6 +199,8 @@ class StandardSQLQueryBuilder(BaseSQLQueryBuilder):
     builders for other SQL dialects. In practice, this is close to e.g. SQLite, Postgres
     and Vertica dialects.
     """
+
+    transformer = StandardSQLVegaExpressionTransformer()
 
     count = staticmethod(lambda x: "count(*)")
     valid = staticmethod(lambda x: f'count(case when "{x}" is not null then 1 end)')
@@ -262,5 +267,5 @@ class StandardSQLQueryBuilder(BaseSQLQueryBuilder):
 
     def transform_filter(self, prev: str, transform: alt.FilterTransform):
         tree = parser.parse(transform.filter)
-        expr = transformer.transform(tree)
+        expr = self.transformer.transform(tree)
         return f"select * from ({prev}) as t where {expr}"

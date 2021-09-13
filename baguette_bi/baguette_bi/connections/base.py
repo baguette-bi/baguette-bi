@@ -2,8 +2,8 @@ import json
 from hashlib import md5
 from typing import Dict, Optional
 
-from baguette_bi.core.connections.query_builders.base import BaseQueryBuilder
-from baguette_bi.core.data_request import DataRequest
+from baguette_bi.connections.query_builders.base import BaseQueryBuilder
+from baguette_bi.data_request import DataRequest
 
 
 class Connection:

@@ -2,7 +2,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 import altair as alt
 
-from baguette_bi.altair.preprocess import gather_requests, preprocess
+from baguette_bi.charts.altair.preprocess import gather_requests, preprocess
 
 VEGALITE_VERSION = alt.schema.SCHEMA_VERSION.lstrip("v")
 VEGA_VERSION = "5"

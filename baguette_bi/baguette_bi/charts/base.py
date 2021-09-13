@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Dict
 
-from baguette_bi.core.context import RenderContext
+from baguette_bi.render_context import RenderContext
 
 
 class Chart(ABC):

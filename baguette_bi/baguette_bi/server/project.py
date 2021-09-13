@@ -8,8 +8,9 @@ from functools import cache
 from pathlib import Path
 from typing import Dict
 
-from baguette_bi.core import AltairChart, Dataset
-from baguette_bi.core.chart import Chart
+from baguette_bi.charts import AltairChart
+from baguette_bi.charts.base import Chart
+from baguette_bi.dataset import Dataset
 from baguette_bi.exc import NotFound
 from baguette_bi.server.templating import Environment, pages
 from baguette_bi.settings import settings

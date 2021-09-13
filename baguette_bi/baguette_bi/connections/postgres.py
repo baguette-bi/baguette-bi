@@ -1,9 +1,7 @@
 from typing import Optional
 
-from baguette_bi.core.connections.query_builders.sql.standard import (
-    StandardSQLQueryBuilder,
-)
-from baguette_bi.core.connections.sql_alchemy import SQLAlchemyConnection
+from baguette_bi.connections.query_builders.sql.standard import StandardSQLQueryBuilder
+from baguette_bi.connections.sql_alchemy import SQLAlchemyConnection
 
 
 class PostgresQueryBuilder(StandardSQLQueryBuilder):

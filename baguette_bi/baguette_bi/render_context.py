@@ -5,7 +5,7 @@ from typing import Any, Callable, Dict, Optional
 import pandas as pd
 from pydantic import create_model
 
-from baguette_bi.core.dataset import DatasetMeta
+from baguette_bi.dataset import DatasetMeta
 
 
 class RenderContext:

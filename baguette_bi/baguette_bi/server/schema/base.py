@@ -2,5 +2,5 @@ from pydantic import BaseModel
 
 
 class Base(BaseModel):
-    class Config:
-        orm_mode: bool = True
+    class Meta:
+        orm_mode = True

@@ -2,7 +2,7 @@ from typing import Optional, Union
 
 import altair as alt
 
-from baguette_bi.altair.utils import (
+from baguette_bi.charts.altair.utils import (
     iterchannels,
     itermulti,
     iterspecs,
@@ -11,7 +11,7 @@ from baguette_bi.altair.utils import (
     prepend_transforms,
     unit_charts,
 )
-from baguette_bi.core import Dataset
+from baguette_bi.dataset import Dataset
 
 
 class NotSupportedError(Exception):

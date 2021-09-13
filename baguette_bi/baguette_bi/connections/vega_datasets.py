@@ -1,6 +1,6 @@
 from vega_datasets import data
 
-from baguette_bi.core.connections.base import Connection
+from baguette_bi.connections.base import Connection
 
 
 class VegaDatasetsConnection(Connection):

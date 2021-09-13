@@ -1,4 +1,4 @@
-from baguette_bi.core.chart.base import Chart
+from baguette_bi.charts.base import Chart
 
 
 class AltairChart(Chart):

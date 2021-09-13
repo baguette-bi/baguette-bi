@@ -175,7 +175,7 @@ def users_set_password(username: str, password: Optional[str] = None, n: int = 1
 def enable_transforms():
     import altair as alt
 
-    from baguette_bi.altair.renderer import data_transform_renderer
+    from baguette_bi.charts.altair.renderer import data_transform_renderer
 
     alt.renderers.register("baguette_data_transform", data_transform_renderer)
     alt.renderers.enable("baguette_data_transform")

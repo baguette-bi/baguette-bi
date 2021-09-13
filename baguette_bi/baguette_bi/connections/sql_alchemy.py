@@ -3,10 +3,8 @@ import pandas as pd
 from sqlalchemy.engine import create_engine
 from sqlalchemy.engine.url import URL
 
-from baguette_bi.core.connections.base import Connection
-from baguette_bi.core.connections.query_builders.sql.standard import (
-    StandardSQLQueryBuilder,
-)
+from baguette_bi.connections.base import Connection
+from baguette_bi.connections.query_builders.sql.standard import StandardSQLQueryBuilder
 
 
 class SQLAlchemyConnection(Connection):

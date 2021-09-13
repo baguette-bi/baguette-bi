@@ -5,7 +5,7 @@ import pandas as pd
 import pydantic
 
 from baguette_bi.cache import get_cache
-from baguette_bi.core.data_request import DataRequest
+from baguette_bi.data_request import DataRequest
 
 cache = get_cache()
 

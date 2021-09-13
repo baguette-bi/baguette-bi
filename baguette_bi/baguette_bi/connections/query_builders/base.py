@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Optional
 import altair as alt
 from jinja2 import Template
 
-from baguette_bi.core.connections.query_builders.errors import (
+from baguette_bi.connections.query_builders.errors import (
     UnsupportedTransformQueryBuilderError,
 )
 
