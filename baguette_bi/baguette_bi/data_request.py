@@ -1,10 +1,9 @@
-import json
-from hashlib import md5
 from typing import Any, Dict, List, Optional
 
 import pandas as pd
 
 from baguette_bi.cache import get_cache
+from baguette_bi.mixins import IDMixin
 
 cache = get_cache()
 
@@ -13,7 +12,7 @@ class DataTransform:
     pass
 
 
-class DataRequest:
+class DataRequest(IDMixin):
     def __init__(
         self,
         *,
@@ -26,9 +25,6 @@ class DataRequest:
         self.parameters = parameters if parameters is not None else {}
         self.transforms = transforms if transforms is not None else []
         self.echo = echo
-        self.id = md5(
-            json.dumps(self.dict(), sort_keys=True, default=str).encode()
-        ).hexdigest()
 
     def __hash__(self):
         return hash(self.id)
@@ -46,12 +42,12 @@ class DataRequest:
     def query(self):
         return self.dataset.query
 
-    def dict(self):
+    def details(self):
         return {
             "dataset_id": self.dataset.id,
             "connection_id": self.dataset.connection.id,
             "parameters": self.parameters,
-            "transforms": self.transforms,
+            "transforms": [t.to_dict() for t in self.transforms],
         }
 
     def execute(self) -> pd.DataFrame:

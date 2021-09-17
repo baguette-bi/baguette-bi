@@ -1,8 +1,8 @@
 from datetime import date
 from time import sleep, time
 
-from baguette_bi.core.context import RenderContext
-from baguette_bi.core.dataset import Dataset
+from baguette_bi.dataset import Dataset
+from baguette_bi.render_context import RenderContext
 
 
 def test_convert_parameters():

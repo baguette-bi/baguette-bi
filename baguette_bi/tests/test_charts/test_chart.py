@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock
 
-from baguette_bi.core.chart import AltairChart
-from baguette_bi.core.context import RenderContext
+from baguette_bi.charts import AltairChart
+from baguette_bi.render_context import RenderContext
 
 
 def test_generate_id():

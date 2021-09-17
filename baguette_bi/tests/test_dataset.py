@@ -2,7 +2,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from baguette_bi.core.dataset import Dataset
+from baguette_bi.dataset import Dataset
 
 
 @pytest.fixture

@@ -1,7 +1,7 @@
 import pandas as pd
 
-from baguette_bi.core.connections.sql_alchemy import SQLAlchemyConnection
-from baguette_bi.core.data_request import DataRequest
+from baguette_bi.connections.sql_alchemy import SQLAlchemyConnection
+from baguette_bi.data_request import DataRequest
 
 
 def test_execute(engine):

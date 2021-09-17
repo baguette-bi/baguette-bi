@@ -44,6 +44,44 @@ def aggregate_from_channel(channel) -> alt.AggregatedFieldDef:
     )
 
 
+def _bin_names(field: alt.FieldName):
+    field = field.to_dict()
+    return f"{field}_bin_start", f"{field}_bin_end"
+
+
+def bin_from_channel(channel) -> Optional[alt.BinTransform]:
+    """Given a channel with inline bin transform, return a corresponding BinTransform.
+    Returns None if binned is True.
+    """
+    if channel.bin.binned is True:
+        return None
+    field = channel.field.to_dict()
+    aliases = _bin_names(field)
+    return alt.BinTransform(bin=channel.bin, field=field, **{"as": aliases})
+
+
+def update_binned_channels(encoding):
+    encoding = encoding.copy()
+    new_channels = {}
+    for channel in iterchannels(encoding):
+        if channel.bin != alt.Undefined and channel.bin.binned is not True:
+            start, end = _bin_names(channel.field)
+            b = channel.bin
+            field = channel.field
+            channel.field = alt.FieldName(start)
+            # update axis title
+            if isinstance(channel, (alt.X, alt.Y, alt.Row, alt.Column)):
+                axis_title = f"{field} (binned)"
+                if (
+                    channel.axis != alt.Undefined
+                    and channel.axis.title == alt.Undefined
+                ):
+                    channel.axis.title = axis_title
+                elif channel.axis == alt.Undefined:
+                    channel.axis = alt.Axis(title=axis_title)
+    return encoding
+
+
 def extract_inline_transforms_chart(chart: Union[alt.Chart, alt.UnitSpec]):
     """Given a lowest-level non-composite chart, return a new chart with inline
     transforms replaced with explicit ones.

@@ -1,6 +1,6 @@
 from datetime import date
 
-from baguette_bi.core.data_request import DataRequest
+from baguette_bi.data_request import DataRequest
 
 
 def test_parameters_default():

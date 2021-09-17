@@ -2,19 +2,8 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from baguette_bi.core.connections.base import Connection, execute_wrapper
-from baguette_bi.core.data_request import DataRequest
-
-
-def test_execute_wrapper():
-    mockfn = MagicMock()
-    mockconn = MagicMock()
-    mockreq = MagicMock()
-    wrapped = execute_wrapper(mockfn)
-    wrapped(mockconn, mockreq)
-    assert mockconn.transform_request.call_count == 1
-    assert mockfn.call_count == 1
-    assert len(mockfn.call_args.args) == 2
+from baguette_bi.connections.base import Connection
+from baguette_bi.data_request import DataRequest
 
 
 def test_connection_dict():

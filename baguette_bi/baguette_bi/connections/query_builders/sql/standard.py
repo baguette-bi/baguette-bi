@@ -269,3 +269,6 @@ class StandardSQLQueryBuilder(BaseSQLQueryBuilder):
         tree = parser.parse(transform.filter)
         expr = self.transformer.transform(tree)
         return f"select * from ({prev}) as t where {expr}"
+
+    def transform_bin(self, prev: str, transform: alt.BinTransform):
+        return super().transform_bin(prev, transform)

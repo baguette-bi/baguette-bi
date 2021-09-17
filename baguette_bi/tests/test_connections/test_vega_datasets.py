@@ -1,7 +1,7 @@
 import pandas as pd
 
-from baguette_bi.core.connections.vega_datasets import VegaDatasetsConnection
-from baguette_bi.core.data_request import DataRequest
+from baguette_bi.connections.vega_datasets import VegaDatasetsConnection
+from baguette_bi.data_request import DataRequest
 
 
 def test_type():
