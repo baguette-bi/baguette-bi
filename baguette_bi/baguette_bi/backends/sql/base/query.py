@@ -71,7 +71,7 @@ class SQLQuery(Query):
         select_list = []
         groupby_list = []
         if transform.groupby != alt.Undefined:
-            groupby_list = transform.groupby
+            groupby_list = [g.to_dict() for g in transform.groupby]
             select_list += groupby_list
         for agg in transform.aggregate:
             call, alias = self._get_aggregate_function_call_and_alias(agg)
@@ -104,28 +104,32 @@ class SQLQuery(Query):
     def transform_bin(self, prev: str, transform: alt.BinTransform):
         field = transform.field.to_dict()
         # determine extent
-        query = self.transform_aggregate(
-            prev,
-            alt.AggregateTransform.from_dict(
-                {
-                    "aggregate": [
-                        {"op": "min", "field": field, "as": "min_extent"},
-                        {"op": "max", "field": field, "as": "max_extent"},
-                    ]
-                }
-            ),
-        )
-        if self.echo:
-            print(query)
-        _, start, stop = next(self.client.execute(query, self.parameters).itertuples())
+        if transform.bin is True or transform.bin.extent == alt.Undefined:
+            query = self.transform_aggregate(
+                prev,
+                alt.AggregateTransform.from_dict(
+                    {
+                        "aggregate": [
+                            {"op": "min", "field": field, "as": "min_extent"},
+                            {"op": "max", "field": field, "as": "max_extent"},
+                        ]
+                    }
+                ),
+            )
+            if self.echo:
+                print(query)
+            _, *extent = next(self.client.execute(query, self.parameters).itertuples())
+            if transform.bin is True:
+                transform.bin = alt.BinParams(extent=extent)
+            else:
+                transform.bin.extent = extent
         # determine bin size
         bin_params = {}
         bin_params.update(bin_defaults)
         if isinstance(transform.bin, alt.BinParams):
             bin_params.update(transform.bin.to_dict())
-        start, stop, step = determine_bin_size([start, stop], **bin_params)
+        start, stop, step = determine_bin_size(**bin_params)
         b0, b1 = self._get_bin_aliases(transform)
-        # floor((v - start) / step) * step + start
         # bin is just a series of calculations
         c0 = self.transform_calculate(
             prev,
@@ -139,9 +143,18 @@ class SQLQuery(Query):
                 }
             ),
         )
-        return self.transform_calculate(
+        c1 = self.transform_calculate(
             c0,
             alt.CalculateTransform.from_dict(
                 {"calculate": f"datum['{b0}'] + {step}", "as": b1}
+            ),
+        )
+        return self.transform_calculate(
+            c1,
+            alt.CalculateTransform.from_dict(
+                {
+                    "calculate": f"datum['{b0}'] + ' – ' + datum['{b1}']",
+                    "as": f"{b0}_{b1}_range",
+                }
             ),
         )

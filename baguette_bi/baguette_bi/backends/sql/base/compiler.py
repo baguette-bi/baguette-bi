@@ -1,7 +1,6 @@
 import math
 
-from lark import Transformer
-
+from baguette_bi.backends.base.compiler import Compiler
 from baguette_bi.backends.sql.base.functions import NotImplementedSQLFunction
 
 
@@ -80,7 +79,7 @@ class SQLFunctionCompiler:
     upper = NotImplementedSQLFunction()
 
 
-class SQLCompiler(Transformer):
+class SQLCompiler(Compiler):
     """Compiles Vega Expressions AST to SQL str.
 
     Should support most SQL dialects, which differ only in function sets, so functions
@@ -139,14 +138,9 @@ class SQLCompiler(Transformer):
     def FALSE(self, token):
         return "false"
 
-    def INTEGER(self, token):
-        return token
-
-    def NUMBER(self, token):
-        return token
-
-    def STRING(self, token):
-        return self._quote_string(token)
+    INTEGER = int
+    NUMBER = float
+    STRING = str
 
     def FIELD(self, token):
         return self._quote_identifier(token)
@@ -178,6 +172,7 @@ class SQLCompiler(Transformer):
     ne = binop("<>")
     and_ = binop("and")
     or_ = binop("or")
+    concat = binop("||")
 
     def tern(self, token):  # ternary
         a, b, c = token
@@ -191,6 +186,3 @@ class SQLCompiler(Transformer):
 
     def expr(self, token):  # root expr
         return token[0]
-
-    def compile(self, tree):
-        return self.transform(tree)

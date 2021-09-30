@@ -42,12 +42,9 @@ SQRT2: "SQRT2"
 // literals
 TRUE: "true"
 FALSE: "false"
-%import common.ESCAPED_STRING -> DOUBLE_QUOTES_STRING
-%import common._STRING_ESC_INNER
-SINGLE_QUOTES_STRING: "'" _STRING_ESC_INNER "'"
-STRING: SINGLE_QUOTES_STRING | DOUBLE_QUOTES_STRING
 %import common.SIGNED_INT     -> INTEGER
 %import common.SIGNED_NUMBER  -> NUMBER
+%import python.STRING  // python strings same as JS
 ?literal: TRUE | FALSE | INTEGER | NUMBER | STRING
 
 // datum access
