@@ -34,6 +34,9 @@ These things are not implemented yet, but will be in the future (in rough order 
 
 ## Release notes
 
+### 0.1.11
+- Update dependencies
+
 ### 0.1.10
 - fix bug in `set_params` that mutated template context
 
